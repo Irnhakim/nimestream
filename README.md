@@ -29,7 +29,7 @@ NimeStream adalah platform website streaming anime modern berkinerja tinggi yang
 
 ### 1. Klon Repositori
 ```bash
-git clone https://github.com/username/nimestream.git
+git clone https://github.com/irnhakim/nimestream.git
 cd nimestream
 ```
 
