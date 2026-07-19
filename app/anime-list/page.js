@@ -60,11 +60,7 @@ export default async function AnimeListPage() {
                 {char}
               </h2>
               
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '0.75rem'
-              }}>
+              <div className="anime-list-grid">
                 {list[char].map((anime, idx) => (
                   <Link
                     key={idx}

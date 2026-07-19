@@ -24,11 +24,7 @@ export default async function GenreListPage() {
           Temukan anime berdasarkan kategori atau genre favorit Anda.
         </p>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-          gap: '1rem'
-        }}>
+        <div className="genre-grid">
           {genres.map((g, idx) => (
             <Link
               key={idx}

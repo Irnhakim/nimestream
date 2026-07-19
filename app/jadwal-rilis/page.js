@@ -30,11 +30,7 @@ export default async function JadwalRilisPage() {
           Berikut adalah jadwal rilis mingguan untuk anime yang sedang tayang (on-going).
         </p>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-          gap: '2rem'
-        }}>
+        <div className="schedule-grid">
           {sortedDays.map((day) => (
             <div
               key={day}
