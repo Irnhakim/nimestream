@@ -35,7 +35,7 @@ export default async function SearchPage({ searchParams }) {
                 <div className="card-img-wrapper">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={item.thumb}
+                    src={item.thumb ? `/api/img?url=${encodeURIComponent(item.thumb)}` : '/placeholder.svg'}
                     alt={item.title}
                     className="card-img"
                     loading="lazy"

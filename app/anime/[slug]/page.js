@@ -34,7 +34,7 @@ export default async function AnimeDetailsPage({ params }) {
       <div className="detail-container">
         <div className="detail-sidebar">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={anime.thumb} alt={anime.title} className="detail-thumb" />
+          <img src={anime.thumb ? `/api/img?url=${encodeURIComponent(anime.thumb)}` : '/placeholder.svg'} alt={anime.title} className="detail-thumb" />
           
           <div className="info-box">
             {Object.entries(anime.info).map(([key, value]) => (
