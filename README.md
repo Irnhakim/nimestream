@@ -49,7 +49,7 @@ NEXT_PUBLIC_OTAKUDESU_URL=https://otakudesu.blog
 ```bash
 npm run dev
 ```
-Buka browser Anda dan akses di [http://localhost:3003](http://localhost:3003).
+Buka browser Anda dan akses di [http://localhost:3006](http://localhost:3006).
 
 ### 5. Build untuk Produksi
 ```bash
