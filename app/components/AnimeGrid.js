@@ -1,13 +1,20 @@
 import Link from 'next/link';
 
-export default function AnimeGrid({ title, items }) {
+export default function AnimeGrid({ title, items, moreLink }) {
   if (!items || items.length === 0) {
     return null;
   }
 
   return (
     <div className="section-wrapper">
-      <h2 className="section-title">{title}</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <h2 className="section-title" style={{ marginBottom: 0 }}>{title}</h2>
+        {moreLink && (
+          <Link href={moreLink} className="btn-download" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px' }}>
+            {title.includes('On-Going') ? 'CEK ANIME ON-GOING LAINNYA' : 'CEK ANIME SELESAI LAINNYA'} &raquo;
+          </Link>
+        )}
+      </div>
       <div className="anime-grid">
         {items.map((item, idx) => (
           <Link key={idx} href={`/anime/${item.slug}`} className="anime-card">
@@ -22,6 +29,11 @@ export default function AnimeGrid({ title, items }) {
               {item.ep && (
                 <div className="card-badge">
                   {item.ep}
+                </div>
+              )}
+              {item.dayOrRating && (
+                <div className="card-badge" style={{ left: 'auto', right: '10px', background: 'linear-gradient(135deg, var(--color-candy-purple), var(--color-candy-pink))' }}>
+                  {item.dayOrRating}
                 </div>
               )}
             </div>

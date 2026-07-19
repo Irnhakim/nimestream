@@ -3,7 +3,7 @@ import AnimeGrid from './components/AnimeGrid';
 async function getData(endpoint) {
   try {
     const res = await fetch(`http://localhost:3000/api/${endpoint}`, {
-      next: { revalidate: 300 }
+      cache: 'no-store'
     });
     if (!res.ok) return [];
     return await res.json();
@@ -26,9 +26,9 @@ export default async function Home() {
         </p>
       </div>
 
-      <AnimeGrid title="Anime On-Going Terbaru" items={ongoing} />
+      <AnimeGrid title="Anime On-Going Terbaru" items={ongoing} moreLink="/ongoing-anime" />
       
-      <AnimeGrid title="Anime Completed Terbaru" items={completed} />
+      <AnimeGrid title="Anime Completed Terbaru" items={completed} moreLink="/anime-list" />
     </main>
   );
 }

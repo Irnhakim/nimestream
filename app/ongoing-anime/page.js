@@ -43,6 +43,11 @@ export default async function OngoingAnimePage({ searchParams }) {
                         {item.ep}
                       </div>
                     )}
+                    {item.dayOrRating && (
+                      <div className="card-badge" style={{ left: 'auto', right: '10px', background: 'linear-gradient(135deg, var(--color-candy-purple), var(--color-candy-pink))' }}>
+                        {item.dayOrRating}
+                      </div>
+                    )}
                   </div>
                   <div className="card-info">
                     <h3 className="card-title" title={item.title}>
