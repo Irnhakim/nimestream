@@ -19,7 +19,9 @@ export default function Header() {
   return (
     <header>
       <div className="header-container">
-        <Link href="/" className="logo">
+        <Link href="/" className="logo" style={{ display: 'flex', alignItems: 'center' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="NS Logo" style={{ width: '32px', height: '32px', borderRadius: '8px', marginRight: '8px' }} />
           Nime<span>Stream</span>
         </Link>
 
