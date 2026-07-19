@@ -172,6 +172,72 @@ footer span {
   color: var(--color-candy-pink);
 }
 
+/* Support Me Section */
+.support-section {
+  background: linear-gradient(135deg, rgba(176, 92, 255, 0.08), rgba(255, 96, 151, 0.06));
+  border: 1px solid rgba(176, 92, 255, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+
+.support-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+}
+
+.support-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.1rem;
+}
+
+.support-buttons {
+  display: flex;
+  gap: 0.875rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-support {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+  border: 1px solid transparent;
+}
+
+.btn-bmc {
+  background: linear-gradient(135deg, #FFDD00, #FFA500);
+  color: #1a0d00;
+  border-color: rgba(255, 221, 0, 0.3);
+}
+
+.btn-bmc:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 200, 0, 0.35);
+}
+
+.btn-saweria {
+  background: linear-gradient(135deg, var(--color-candy-pink), var(--color-candy-purple));
+  color: white;
+  border-color: rgba(255, 96, 151, 0.3);
+}
+
+.btn-saweria:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 96, 151, 0.35);
+}
+
 /* Grid Layouts */
 .anime-grid {
   display: grid;
