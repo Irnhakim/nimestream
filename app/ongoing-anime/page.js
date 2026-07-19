@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { LOCAL_API_URL } from '@/lib/scraper';
 
 async function getOngoingAnimeList(page = 1) {
   try {
-    const res = await fetch(`http://localhost:3000/api/ongoing-list?page=${page}`, {
-      next: { revalidate: 300 }
+    const res = await fetch(`${LOCAL_API_URL}/api/ongoing-list?page=${page}`, {
+      cache: 'no-store'
     });
     if (!res.ok) return { items: [], pagination: [] };
     return await res.json();
@@ -44,7 +45,7 @@ export default async function OngoingAnimePage({ searchParams }) {
                       </div>
                     )}
                     {item.dayOrRating && (
-                      <div className="card-badge" style={{ left: 'auto', right: '10px', background: 'linear-gradient(135deg, var(--color-candy-purple), var(--color-candy-pink))' }}>
+                      <div className="card-badge-sub">
                         {item.dayOrRating}
                       </div>
                     )}

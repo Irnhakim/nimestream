@@ -1,8 +1,9 @@
 import AnimeGrid from './components/AnimeGrid';
+import { LOCAL_API_URL } from '@/lib/scraper';
 
 async function getData(endpoint) {
   try {
-    const res = await fetch(`http://localhost:3000/api/${endpoint}`, {
+    const res = await fetch(`${LOCAL_API_URL}/api/${endpoint}`, {
       cache: 'no-store'
     });
     if (!res.ok) return [];

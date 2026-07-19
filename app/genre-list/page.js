@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { LOCAL_API_URL } from '@/lib/scraper';
 
 async function getGenres() {
   try {
-    const res = await fetch('http://localhost:3000/api/genres', {
-      next: { revalidate: 86400 } // Cache for 24h
+    const res = await fetch(`${LOCAL_API_URL}/api/genres`, {
+      cache: 'no-store'
     });
     if (!res.ok) return [];
     return await res.json();

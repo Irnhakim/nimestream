@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { LOCAL_API_URL } from '@/lib/scraper';
 
 async function getAnimeList() {
   try {
-    const res = await fetch('http://localhost:3000/api/animelist', {
-      next: { revalidate: 600 }
+    const res = await fetch(`${LOCAL_API_URL}/api/animelist`, {
+      cache: 'no-store'
     });
     if (!res.ok) return {};
     return await res.json();

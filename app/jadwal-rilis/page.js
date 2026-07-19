@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { LOCAL_API_URL } from '@/lib/scraper';
 
 async function getJadwalRilis() {
   try {
-    const res = await fetch('http://localhost:3000/api/jadwal', {
-      next: { revalidate: 600 }
+    const res = await fetch(`${LOCAL_API_URL}/api/jadwal`, {
+      cache: 'no-store'
     });
     if (!res.ok) return {};
     return await res.json();

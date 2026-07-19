@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import { LOCAL_API_URL } from '@/lib/scraper';
 
 async function getAnimeDetails(slug) {
   try {
-    const res = await fetch(`http://localhost:3000/api/anime/${slug}`, {
+    const res = await fetch(`${LOCAL_API_URL}/api/anime/${slug}`, {
       cache: 'no-store'
     });
     if (!res.ok) return null;

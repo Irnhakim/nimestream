@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { LOCAL_API_URL } from '@/lib/scraper';
 
 async function getGenreAnime(slug, page = 1) {
   try {
-    const res = await fetch(`http://localhost:3000/api/genres/${slug}?page=${page}`, {
-      next: { revalidate: 300 }
+    const res = await fetch(`${LOCAL_API_URL}/api/genres/${slug}?page=${page}`, {
+      cache: 'no-store'
     });
     if (!res.ok) return { items: [], pagination: [] };
     return await res.json();

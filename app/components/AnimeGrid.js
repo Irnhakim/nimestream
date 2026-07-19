@@ -32,7 +32,7 @@ export default function AnimeGrid({ title, items, moreLink }) {
                 </div>
               )}
               {item.dayOrRating && (
-                <div className="card-badge" style={{ left: 'auto', right: '10px', background: 'linear-gradient(135deg, var(--color-candy-purple), var(--color-candy-pink))' }}>
+                <div className="card-badge-sub">
                   {item.dayOrRating}
                 </div>
               )}

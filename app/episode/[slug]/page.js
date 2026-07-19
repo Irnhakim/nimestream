@@ -1,8 +1,9 @@
 import EpisodeStreamPlayer from '@/app/components/EpisodeStreamPlayer';
+import { LOCAL_API_URL } from '@/lib/scraper';
 
 async function getEpisodeDetails(slug) {
   try {
-    const res = await fetch(`http://localhost:3000/api/episode/${slug}`, {
+    const res = await fetch(`${LOCAL_API_URL}/api/episode/${slug}`, {
       cache: 'no-store'
     });
     if (!res.ok) return null;

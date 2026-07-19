@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import { LOCAL_API_URL } from '@/lib/scraper';
 
 async function performSearch(query) {
   try {
-    const res = await fetch(`http://localhost:3000/api/search?q=${encodeURIComponent(query)}`, {
+    const res = await fetch(`${LOCAL_API_URL}/api/search?q=${encodeURIComponent(query)}`, {
       cache: 'no-store'
     });
     if (!res.ok) return [];
