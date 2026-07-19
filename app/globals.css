@@ -336,7 +336,7 @@ footer span {
 
 .hero-banner {
   background: linear-gradient(135deg, rgba(21, 24, 36, 0.85) 0%, rgba(12, 13, 19, 0.95) 100%), 
-              url('/hero-bg.png');
+              url('/hero-bg-v2.png');
   background-size: cover;
   background-position: center;
   border-radius: 16px;
