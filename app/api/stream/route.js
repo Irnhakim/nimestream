@@ -1,4 +1,5 @@
 import * as cheerio from 'cheerio';
+import { BASE_URL } from '@/lib/scraper';
 
 export async function POST(request) {
   try {
@@ -14,13 +15,13 @@ export async function POST(request) {
     const nonceFormData = new URLSearchParams();
     nonceFormData.append('action', 'aa1208d27f29ca340c92c66d1926f13f');
     
-    const nonceRes = await fetch('https://otakudesu.blog/wp-admin/admin-ajax.php', {
+    const nonceRes = await fetch(`${BASE_URL}/wp-admin/admin-ajax.php`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Origin': 'https://otakudesu.blog',
-        'Referer': 'https://otakudesu.blog/'
+        'Origin': BASE_URL,
+        'Referer': `${BASE_URL}/`
       },
       body: nonceFormData.toString()
     });
@@ -39,13 +40,13 @@ export async function POST(request) {
     streamFormData.append('i', decodedPayload.i);
     streamFormData.append('q', decodedPayload.q);
 
-    const streamRes = await fetch('https://otakudesu.blog/wp-admin/admin-ajax.php', {
+    const streamRes = await fetch(`${BASE_URL}/wp-admin/admin-ajax.php`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Origin': 'https://otakudesu.blog',
-        'Referer': 'https://otakudesu.blog/'
+        'Origin': BASE_URL,
+        'Referer': `${BASE_URL}/`
       },
       body: streamFormData.toString()
     });
