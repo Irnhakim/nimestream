@@ -15,6 +15,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="id">
       <head>
+        <meta name="b1a183711a4cd7aa4f65c6eaebb8283660c15d5e" content="b1a183711a4cd7aa4f65c6eaebb8283660c15d5e" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
