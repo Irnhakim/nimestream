@@ -1,5 +1,6 @@
 import './globals.css';
 import Header from './components/Header';
+import PopunderAd from './components/PopunderAd';
 
 export const metadata = {
   title: 'NimeStream - Nonton & Streaming Anime Subtitle Indonesia',
@@ -23,6 +24,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <Header />
+        <PopunderAd />
         {children}
         <footer>
           <div className="support-section">
