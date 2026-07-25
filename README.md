@@ -6,7 +6,7 @@ NimeStream adalah platform website streaming anime modern berkinerja tinggi yang
 
 ## ✨ Fitur Utama
 
-- 🏠 **Beranda Interaktif**: Banner utama dinamis Rory Mercury, serta daftar grid anime *On-Going* (sedang tayang) dan *Completed* (tamat).
+- 🏠 **Beranda Interaktif**: Daftar grid anime *On-Going* (sedang tayang) dan *Completed* (tamat).
 - 📅 **Jadwal Rilis Mingguan**: Menampilkan daftar rilis harian anime dari Senin sampai Minggu.
 - 🔠 **Indeks Anime A-Z**: Navigasi alfabetik instan untuk mencari judul anime favorit Anda.
 - 🏷️ **Daftar & Filter Genre**: Telusuri anime berdasarkan genre/kategori dengan sistem paginasi yang rapi.
