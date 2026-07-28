@@ -118,7 +118,6 @@ function SearchPageClient() {
                     {item.title}
                   </h3>
                   <div className="card-meta">
-                    <span style={{ color: 'var(--color-candy-cyan)' }}>📺 Otakudesu</span>
                     <span>{item.status}</span>
                   </div>
                 </div>
@@ -145,7 +144,6 @@ function SearchPageClient() {
                     {item.title}
                   </h3>
                   <div className="card-meta">
-                    <span style={{ color: 'var(--color-candy-pink)' }}>📦 Kusonime</span>
                     <span>Batch</span>
                   </div>
                 </div>
