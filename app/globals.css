@@ -835,6 +835,142 @@ footer span {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 0.75rem;
   }
+}/* =====================
+   Episode Box Component
+   ===================== */
+.episode-box {
+  border: 1px solid rgba(176, 92, 255, 0.15);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-card);
 }
 
+/* Navbar */
+.episode-box-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(176, 92, 255, 0.06);
+  border-bottom: 1px solid rgba(176, 92, 255, 0.12);
+  flex-wrap: wrap;
+}
 
+.episode-box-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Search Input */
+.episode-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  color: var(--text-muted);
+}
+
+.episode-search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-family: inherit;
+  width: 150px;
+}
+
+.episode-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Order Button */
+.episode-order-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+}
+
+.episode-order-btn:hover {
+  background: rgba(176, 92, 255, 0.1);
+  border-color: rgba(176, 92, 255, 0.3);
+  color: var(--color-candy-purple);
+}
+
+/* Scrollable List */
+.episode-scroll-list {
+  max-height: 420px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(176, 92, 255, 0.3) transparent;
+}
+
+.episode-scroll-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.episode-scroll-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.episode-scroll-list::-webkit-scrollbar-thumb {
+  background: rgba(176, 92, 255, 0.3);
+  border-radius: 10px;
+}
+
+/* Episode Item */
+.episode-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--text-main);
+  text-decoration: none;
+  transition: var(--transition-smooth);
+  gap: 1rem;
+}
+
+.episode-item:last-child {
+  border-bottom: none;
+}
+
+.episode-item:hover {
+  background: rgba(255, 96, 151, 0.06);
+  padding-left: 1.3rem;
+  color: var(--color-candy-pink);
+}
+
+.episode-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.episode-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
