@@ -8,18 +8,24 @@ export async function GET(request) {
     return new Response('Missing url parameter', { status: 400 });
   }
 
-  // Only allow proxying images from otakudesu domain for security
-  const allowed = ['otakudesu.blog', 'otakudesu.cloud', 'otakudesu.ltd', 'i3.wp.com', 'i2.wp.com', 'i1.wp.com', 'i0.wp.com', 'cdn.otakudesu'];
+  // Only allow proxying images from allowed domains for security
+  const allowed = ['otakudesu.blog', 'otakudesu.cloud', 'otakudesu.ltd', 'i3.wp.com', 'i2.wp.com', 'i1.wp.com', 'i0.wp.com', 'cdn.otakudesu', 'kusonime.com', 'wp-content'];
   const isAllowed = allowed.some(domain => imageUrl.includes(domain));
   if (!isAllowed) {
     return new Response('Forbidden', { status: 403 });
+  }
+
+  // Determine proper referer
+  let referer = `${BASE_URL}/`;
+  if (imageUrl.includes('kusonime.com')) {
+    referer = 'https://kusonime.com/';
   }
 
   try {
     const response = await fetch(imageUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': `${BASE_URL}/`,
+        'Referer': referer,
         'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
         'Accept-Encoding': 'gzip, deflate, br',
       },

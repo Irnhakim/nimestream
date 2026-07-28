@@ -41,10 +41,6 @@ export default async function KusonimeBatchPage({ params }) {
           />
           
           <div className="info-box">
-            <div style={{ marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem' }}>
-              <span className="info-label" style={{ color: 'var(--color-candy-cyan)' }}>Sumber Data</span>
-              <span className="info-value" style={{ fontWeight: '700' }}>Kusonime (Batch)</span>
-            </div>
             {Object.entries(anime.info).map(([key, value]) => (
               <div key={key} className="info-item">
                 <span className="info-label">{key}</span>
