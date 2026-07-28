@@ -50,7 +50,7 @@ export default async function GenreCategoryPage({ params, searchParams }) {
                     />
                     {item.rating && (
                       <div className="card-badge" style={{ background: 'linear-gradient(135deg, var(--color-candy-cyan), var(--color-candy-purple))' }}>
-                        &starf; {item.rating}
+                        ★ {item.rating}
                       </div>
                     )}
                   </div>

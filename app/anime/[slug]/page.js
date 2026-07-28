@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { LOCAL_API_URL } from '@/lib/scraper';
+import EpisodeBox from '@/app/components/EpisodeBox';
 
 async function getAnimeDetails(slug) {
   try {
@@ -72,18 +73,11 @@ export default async function AnimeDetailsPage({ params }) {
 
           <div>
             <h2 className="section-title">Daftar Episode</h2>
-            <div className="episode-list">
-              {anime.episodes.length === 0 ? (
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Belum ada episode yang dirilis.</p>
-              ) : (
-                anime.episodes.map((ep, idx) => (
-                  <Link key={idx} href={`/episode/${ep.slug}`} className="episode-item">
-                    <span className="episode-title">{ep.title}</span>
-                    <span className="episode-date">{ep.date}</span>
-                  </Link>
-                ))
-              )}
-            </div>
+            {anime.episodes.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Belum ada episode yang dirilis.</p>
+            ) : (
+              <EpisodeBox episodes={anime.episodes} />
+            )}
           </div>
         </div>
       </div>
