@@ -874,7 +874,7 @@ footer span {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .stream-container {
     grid-template-columns: 1fr;
   }
