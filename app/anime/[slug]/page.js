@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { LOCAL_API_URL } from '@/lib/scraper';
 import EpisodeBox from '@/app/components/EpisodeBox';
+import KusonimeBatchLink from '@/app/components/KusonimeBatchLink';
 
 async function getAnimeDetails(slug) {
   try {
@@ -70,6 +71,9 @@ export default async function AnimeDetailsPage({ params }) {
               </Link>
             </div>
           )}
+
+          {/* Automatic Kusonime Batch Finder Link */}
+          <KusonimeBatchLink animeTitle={anime.title} />
 
           <div>
             <h2 className="section-title">Daftar Episode</h2>

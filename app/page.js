@@ -1,5 +1,6 @@
 import AnimeGrid from './components/AnimeGrid';
 import { LOCAL_API_URL } from '@/lib/scraper';
+import { getLatestKusonime } from '@/lib/kusonimeScraper';
 
 async function getData(endpoint) {
   try {
@@ -18,6 +19,12 @@ export default async function Home() {
   const ongoing = await getData('ongoing');
   const completed = await getData('completed');
 
+  // Server-side fetch for Kusonime if enabled
+  let latestBatch = [];
+  if (process.env.NEXT_PUBLIC_KUSONIME_ENABLED === 'true') {
+    latestBatch = await getLatestKusonime(1);
+  }
+
   return (
     <main>
       <div className="hero-banner">
@@ -27,9 +34,16 @@ export default async function Home() {
         </p>
       </div>
 
+      {/* Ongoing Section */}
       <AnimeGrid title="Anime On-Going Terbaru" items={ongoing} moreLink="/ongoing-anime" />
       
+      {/* Completed Section */}
       <AnimeGrid title="Anime Completed Terbaru" items={completed} moreLink="/anime-list" />
+
+      {/* Kusonime Batch Section */}
+      {process.env.NEXT_PUBLIC_KUSONIME_ENABLED === 'true' && latestBatch.length > 0 && (
+        <AnimeGrid title="Anime Batch Terbaru" items={latestBatch} isBatch={true} />
+      )}
     </main>
   );
 }
