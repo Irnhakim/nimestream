@@ -11,7 +11,11 @@ NimeStream adalah platform website streaming anime modern berkinerja tinggi yang
 - 🔠 **Indeks Anime A-Z**: Navigasi alfabetik terpadu yang menggabungkan database anime Otakudesu dan Kusonime dengan sistem deduplikasi judul.
 - 🏷️ **Daftar & Filter Genre**: Telusuri anime berdasarkan genre/kategori dengan sistem paginasi yang rapi.
 - 🎥 **Video Stream Switcher**: Pemutar video dinamis dengan fitur pergantian mirror server secara *client-side*.
-- 📥 **Unduh Episode & Batch**: Link download terstruktur per episode beserta block tabel link download **Batch (Kusonime & Otakudesu)**.
+- 📥 **Unduh Episode & Batch**: Link download terstruktur per episode beserta block tabel link download **Batch (Kusonime & Otakudesu)** langsung di halaman detail anime.
+- 🕒 **Watch History (Riwayat Tontonan)**: 
+  * Perekaman otomatis episode terakhir yang baru saja ditonton dengan meng-query cover anime resmi berformat portrait.
+  * Halaman khusus `/riwayat` lengkap dengan pembersihan instan dan hapus satuan.
+  * Banner **"Lanjutkan Menonton"** di halaman depan (Home) berformat grid portrait sejajar.
 - 🟢 **Real-time Online Counter**: Widget premium pada Header untuk memantau jumlah user aktif yang sedang membuka situs secara real-time.
 - 🌐 **Domain-Change Ready**: Dikonfigurasi secara dinamis untuk memudahkan perubahan domain asal melalui file `.env.local`.
 
@@ -22,6 +26,7 @@ NimeStream adalah platform website streaming anime modern berkinerja tinggi yang
 - **Framework**: [Next.js (React)](https://nextjs.org/)
 - **Scraper Engine**: [Cheerio](https://cheerio.js.org/) (Realtime HTML Parsing)
 - **Database Schedule & Time**: [AniList GraphQL API](https://anilist.co/)
+- **Client Storage**: HTML5 `localStorage` (Watch History Cache)
 - **Styling**: Vanilla CSS (kustom Candy Dark Mode, interaksi mikro-animasi premium)
 - **Rute API**: Next.js Route Handlers (Backend API endpoints untuk heartbeat online counter dan scraper data)
 
@@ -71,15 +76,17 @@ npm run build
 │   ├── anime-list/       # Halaman daftar anime alfabetikal gabungan + deduplikasi
 │   ├── batch/            # Halaman download batch Otakudesu & Kusonime
 │   ├── batch-list/       # Halaman list batch terbaru dengan Page Navigator lengkap
-│   ├── episode/          # Halaman nonton video streaming & download
+│   ├── episode/          # Halaman nonton video streaming & download (dilengkapi auto watch tracker)
 │   ├── genre-list/       # Halaman kategori genre
 │   ├── genres/           # Halaman daftar anime per genre (paginated)
-│   └── jadwal-rilis/     # Halaman jadwal rilis mingguan dengan jam tayang AniList
-├── components/           # Komponen reusable (Header, OnlineUsersCounter, KusonimeBatchLink)
+│   ├── jadwal-rilis/     # Halaman jadwal rilis mingguan dengan jam tayang AniList
+│   └── riwayat/          # Halaman daftar riwayat tontonan user lokal
+├── components/           # Komponen reusable (Header, OnlineUsersCounter, ResumeWatchingBlock)
 ├── lib/                  # Logika core scraper (scraper.js, kusonimeScraper.js)
 ├── public/               # File statik & gambar aset logo
 └── globals.css           # Desain kustom Candy Dark Mode & mikro-animasi
 ```
+
 
 ---
 
