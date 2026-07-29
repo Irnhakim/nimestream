@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 
 export default function KusonimeBatchLink({ animeTitle }) {
-  const [batchInfo, setBatchInfo] = useState(null);
+  const [batchDetails, setBatchDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [kusoEnabled, setKusoEnabled] = useState(false);
 
@@ -15,7 +14,7 @@ export default function KusonimeBatchLink({ animeTitle }) {
   useEffect(() => {
     if (!animeTitle || process.env.NEXT_PUBLIC_KUSONIME_ENABLED !== 'true') return;
 
-    // Clean anime title to maximize search matching (remove tags like "Subtitle Indonesia", Season terms, etc.)
+    // Clean anime title to maximize search matching
     const cleanTitle = animeTitle
       .replace(/subtitle indonesia/gi, '')
       .replace(/sub indo/gi, '')
@@ -29,11 +28,16 @@ export default function KusonimeBatchLink({ animeTitle }) {
     fetch(`/api/kusonime/search?q=${encodeURIComponent(cleanTitle)}`)
       .then(res => (res.ok ? res.json() : []))
       .then(data => {
-        // Find best fuzzy match
         if (data && data.length > 0) {
-          const match = data[0]; // Take first search result as best matching candidate
-          setBatchInfo(match);
+          const match = data[0];
+          // Fetch full batch details containing the direct download links
+          return fetch(`/api/kusonime/detail/${match.slug}`);
         }
+        return null;
+      })
+      .then(res => (res && res.ok ? res.json() : null))
+      .then(details => {
+        setBatchDetails(details);
         setLoading(false);
       })
       .catch(err => {
@@ -42,40 +46,77 @@ export default function KusonimeBatchLink({ animeTitle }) {
       });
   }, [animeTitle]);
 
-  if (!kusoEnabled || loading || !batchInfo) return null;
+  if (!kusoEnabled) return null;
+  if (loading) return <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Mencari link batch download...</p>;
+  if (!batchDetails || !batchDetails.downloads || batchDetails.downloads.length === 0) return null;
 
   return (
-    <div 
-      style={{ 
-        marginBottom: '2rem',
-        padding: '1.25rem',
-        backgroundColor: 'rgba(176, 92, 255, 0.05)',
-        border: '1px dashed var(--color-candy-purple)',
-        borderRadius: '12px'
-      }}
-    >
-      <h3 style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--color-candy-purple)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-        📦 Batch Download Tersedia
-      </h3>
-      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-        Dapatkan seluruh episode sekaligus dengan kualitas dan server mirror lengkap dari Kusonime.
-      </p>
-      <Link 
-        href={`/batch/kuso/${batchInfo.slug}`} 
-        className="btn-candy" 
-        style={{ 
-          display: 'inline-flex',
-          padding: '0.5rem 1.25rem',
-          fontSize: '0.8rem',
-          background: 'linear-gradient(135deg, var(--color-candy-purple), var(--color-candy-pink))'
-        }}
-      >
-        <svg fill="currentColor" viewBox="0 0 24 24" style={{ width: '16px', height: '16px' }}>
-          <path d="M11.644 3.066a1.75 1.75 0 0 1 1.712 0l7.25 4.15a1.75 1.75 0 0 1 0 3.034l-7.25 4.15a1.75 1.75 0 0 1-1.712 0l-7.25-4.15a1.75 1.75 0 0 1 0-3.034l7.25-4.15Z" />
-          <path d="m21.3 12.285-2.25 1.288-6.175-3.535a1.75 1.75 0 0 0-1.75 0l-6.175 3.535-2.25-1.288a.75.75 0 1 0-.75 1.3l2.25 1.288-2.25 1.288a.75.75 0 1 0 .75 1.3l2.25-1.288 6.175 3.535a1.75 1.75 0 0 0 1.75 0l6.175-3.535 2.25 1.288a.75.75 0 1 0 .75-1.3l-2.25-1.288 2.25-1.288a.75.75 0 1 0-.75-1.3Z" />
-        </svg>
-        Download Batch ({batchInfo.title})
-      </Link>
+    <div style={{ marginBottom: '2rem' }}>
+      <h2 className="section-title">Batch Download (Mirror)</h2>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {batchDetails.downloads.map((dlBlock, idx) => (
+          <div
+            key={idx}
+            style={{
+              backgroundColor: 'var(--bg-card)',
+              borderRadius: '14px',
+              border: '1px solid rgba(176, 92, 255, 0.15)',
+              overflow: 'hidden'
+            }}
+          >
+            <div style={{
+              padding: '0.75rem 1rem',
+              background: 'rgba(176, 92, 255, 0.08)',
+              borderBottom: '1px solid rgba(176, 92, 255, 0.15)',
+              fontWeight: '700',
+              fontSize: '0.9rem',
+              color: 'var(--text-main)'
+            }}>
+              📦 {dlBlock.title}
+            </div>
+            <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {dlBlock.links.map((linkRow, lIdx) => (
+                <div
+                  key={lIdx}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.4rem',
+                    borderBottom: lIdx === dlBlock.links.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.03)',
+                    paddingBottom: lIdx === dlBlock.links.length - 1 ? '0' : '0.75rem'
+                  }}
+                >
+                  <span style={{
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    color: 'var(--color-candy-pink)'
+                  }}>
+                    {linkRow.quality}
+                  </span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    {linkRow.servers.map((srv, sIdx) => (
+                      <a
+                        key={sIdx}
+                        href={srv.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-download"
+                        style={{
+                          fontSize: '0.75rem',
+                          padding: '0.35rem 0.75rem',
+                          transition: 'var(--transition-smooth)'
+                        }}
+                      >
+                        🔗 {srv.server}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
