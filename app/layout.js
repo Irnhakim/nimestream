@@ -9,7 +9,29 @@ export const metadata = {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
     apple: '/logo.svg',
-  }
+  },
+  openGraph: {
+    title: 'NimeStream - Nonton & Streaming Anime Subtitle Indonesia',
+    description: 'NimeStream adalah tempat nonton dan streaming anime subtitle indonesia gratis terlengkap dengan tampilan premium.',
+    url: 'https://anime.irnhakim.my.id',
+    siteName: 'NimeStream',
+    images: [
+      {
+        url: 'https://anime.irnhakim.my.id/logo.svg',
+        width: 512,
+        height: 512,
+        alt: 'NimeStream Logo',
+      },
+    ],
+    locale: 'id_ID',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'NimeStream - Nonton & Streaming Anime Subtitle Indonesia',
+    description: 'NimeStream adalah tempat nonton dan streaming anime subtitle indonesia gratis terlengkap dengan tampilan premium.',
+    images: ['https://anime.irnhakim.my.id/logo.svg'],
+  },
 };
 
 export default function RootLayout({ children }) {
