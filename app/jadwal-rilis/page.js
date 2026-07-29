@@ -15,7 +15,7 @@ async function getJadwalRilis() {
 async function getJikanTimes() {
   try {
     const res = await fetch(`${LOCAL_API_URL}/api/jadwal-waktu`, {
-      next: { revalidate: 3600 }
+      cache: 'no-store'
     });
     if (!res.ok) return {};
     return await res.json();
@@ -27,6 +27,7 @@ async function getJikanTimes() {
 
 // Normalize title for fuzzy matching
 function normalizeTitle(title) {
+  if (!title) return '';
   return title
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
@@ -34,37 +35,30 @@ function normalizeTitle(title) {
     .trim();
 }
 
-// Convert Tokyo time (JST = UTC+9) to WIB (UTC+7)
-function toWIB(timeStr) {
-  if (!timeStr) return null;
-  const [h, m] = timeStr.split(':').map(Number);
-  // JST to WIB: -2 hours
-  let wibH = h - 2;
-  if (wibH < 0) wibH += 24;
-  return `${String(wibH).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-}
-
 // Find broadcast time by fuzzy title match
 function findTime(animeTitle, jikanDay) {
   if (!jikanDay || jikanDay.length === 0) return null;
   const normalized = normalizeTitle(animeTitle);
 
-  // Try to find a match in Jikan data
+  // Try to find a match in AniList data
   const match = jikanDay.find(j => {
     const jNorm = normalizeTitle(j.title);
-    // Check if one contains the other or share significant words
-    if (jNorm === normalized) return true;
+    const jNormId = j.titleId ? normalizeTitle(j.titleId) : '';
+    
+    // Check if titles match directly
+    if (jNorm === normalized || jNormId === normalized) return true;
     if (jNorm.includes(normalized) || normalized.includes(jNorm)) return true;
-    // Word overlap check (at least 3 significant words match)
+    
+    // Word overlap check (at least 1 word matches if it's long, or 2 words otherwise)
     const words = normalized.split(' ').filter(w => w.length > 3);
     const jWords = jNorm.split(' ').filter(w => w.length > 3);
     if (words.length === 0) return false;
     const matches = words.filter(w => jWords.includes(w));
-    return matches.length >= Math.min(2, words.length);
+    return matches.length >= 1;
   });
 
   if (!match || !match.time) return null;
-  return toWIB(match.time);
+  return match.time; // Already converted to WIB in the backend API
 }
 
 export default async function JadwalRilisPage() {
