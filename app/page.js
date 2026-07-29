@@ -1,6 +1,7 @@
 import AnimeGrid from './components/AnimeGrid';
 import { LOCAL_API_URL } from '@/lib/scraper';
 import { getLatestKusonime } from '@/lib/kusonimeScraper';
+import ResumeWatchingBlock from './components/ResumeWatchingBlock';
 
 async function getData(endpoint) {
   try {
@@ -34,6 +35,9 @@ export default async function Home() {
           Temukan koleksi anime favoritmu mulai dari yang sedang tayang (ongoing) hingga yang sudah tamat lengkap secara gratis dengan kualitas terbaik.
         </p>
       </div>
+
+      {/* Watch History (Client-side dynamic render) */}
+      <ResumeWatchingBlock />
 
       {/* Ongoing Section */}
       <AnimeGrid title="Anime On-Going Terbaru" items={ongoing} moreLink="/ongoing-anime" />

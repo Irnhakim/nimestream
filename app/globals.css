@@ -520,6 +520,10 @@ footer span {
   .card-meta {
     font-size: 0.65rem;
   }
+  .resume-grid-mobile {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 0.6rem !important;
+  }
 }
 
 /* Page Specific CSS styles for Home, Detail, and Streaming pages */

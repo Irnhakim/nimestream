@@ -1,5 +1,6 @@
 import EpisodeStreamPlayer from '@/app/components/EpisodeStreamPlayer';
 import { LOCAL_API_URL } from '@/lib/scraper';
+import WatchHistoryTracker from '@/app/components/WatchHistoryTracker';
 
 async function getEpisodeDetails(slug) {
   try {
@@ -29,8 +30,35 @@ export default async function EpisodePage({ params }) {
     );
   }
 
+  // Parse parent anime title and episode title
+  // E.g., title = "Tsundere Akuyaku Reijou Liselotte Episode 1 Subtitle Indonesia"
+  // E.g., parentTitle = "Tsundere Akuyaku Reijou Liselotte", episodeTitle = "Episode 1"
+  const rawTitle = episode.title || '';
+  let animeTitle = rawTitle;
+  let episodeTitle = 'Episode Baru';
+
+  const epMatch = rawTitle.match(/(.*)\s+(Episode\s+\d+)/i);
+  if (epMatch) {
+    animeTitle = epMatch[1].trim();
+    episodeTitle = epMatch[2].trim();
+  } else {
+    // Alternate parsing if no match (just split by "Episode")
+    const parts = rawTitle.split(/episode/i);
+    if (parts.length > 1) {
+      animeTitle = parts[0].trim();
+      episodeTitle = `Episode ${parts[1].replace(/subtitle indonesia|sub indo/gi, '').trim()}`;
+    }
+  }
+
   return (
     <main>
+      <WatchHistoryTracker 
+        animeTitle={animeTitle}
+        episodeTitle={episodeTitle}
+        slug={slug}
+        thumb={episode.thumb}
+        source="Otakudesu"
+      />
       <EpisodeStreamPlayer episode={episode} slug={slug} />
     </main>
   );
