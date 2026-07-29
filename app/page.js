@@ -22,7 +22,8 @@ export default async function Home() {
   // Server-side fetch for Kusonime if enabled
   let latestBatch = [];
   if (process.env.NEXT_PUBLIC_KUSONIME_ENABLED === 'true') {
-    latestBatch = await getLatestKusonime(1);
+    const kusoData = await getLatestKusonime(1);
+    latestBatch = kusoData?.items || [];
   }
 
   return (

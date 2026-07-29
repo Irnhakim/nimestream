@@ -6,7 +6,7 @@ export default async function BatchAnimePage({ searchParams }) {
   const page = resolvedSearchParams.page || '1';
   const pageNum = parseInt(page, 10);
 
-  const items = await getLatestKusonime(pageNum);
+  const { items, pagination } = await getLatestKusonime(pageNum);
 
   return (
     <main>
@@ -47,32 +47,110 @@ export default async function BatchAnimePage({ searchParams }) {
                       {item.title}
                     </h3>
                     <div className="card-meta">
-                      <span>Batch</span>
+                      {item.date && (
+                        <span>
+                          <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{width: '12px', height: '12px'}}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          </svg>
+                          {item.date}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </Link>
               ))}
             </div>
 
-            {/* Pagination */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '3rem' }}>
-              {pageNum > 1 && (
-                <Link
-                  href={`/batch-list?page=${pageNum - 1}`}
-                  className="btn-download"
-                  style={{ padding: '0.5rem 1.25rem', borderRadius: '8px' }}
-                >
-                  &laquo; SEBELUMNYA
-                </Link>
-              )}
-              <Link
-                href={`/batch-list?page=${pageNum + 1}`}
-                className="btn-download"
-                style={{ padding: '0.5rem 1.25rem', borderRadius: '8px' }}
+            {/* wp-pagenavi Style Pagination */}
+            {pagination.length > 0 && (
+              <div 
+                style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  flexWrap: 'wrap', 
+                  gap: '0.4rem', 
+                  marginTop: '3.5rem' 
+                }}
               >
-                SELANJUTNYA &raquo;
-              </Link>
-            </div>
+                {pagination.map((pag, idx) => {
+                  // If it's a page count info span (e.g. "Page 1 of 506")
+                  if (pag.text.includes('Page') && pag.text.includes('of')) {
+                    return (
+                      <span
+                        key={idx}
+                        style={{
+                          padding: '0.5rem 0.8rem',
+                          fontSize: '0.8rem',
+                          color: 'var(--text-muted)',
+                          alignSelf: 'center'
+                        }}
+                      >
+                        {pag.text}
+                      </span>
+                    );
+                  }
+
+                  // If it's active page number
+                  if (pag.active) {
+                    return (
+                      <span
+                        key={idx}
+                        className="btn-mirror active"
+                        style={{
+                          padding: '0.5rem 0.95rem',
+                          fontSize: '0.8rem',
+                          fontWeight: '700',
+                          backgroundColor: 'var(--color-candy-pink)',
+                          borderColor: 'var(--color-candy-pink)',
+                          color: 'white',
+                          borderRadius: '8px',
+                          cursor: 'default'
+                        }}
+                      >
+                        {pag.text}
+                      </span>
+                    );
+                  }
+
+                  // If it's the extend (...) dots
+                  if (pag.isExtend || pag.text === '...') {
+                    return (
+                      <span
+                        key={idx}
+                        style={{
+                          padding: '0.5rem 0.5rem',
+                          fontSize: '0.8rem',
+                          color: 'var(--text-muted)',
+                          alignSelf: 'flex-end'
+                        }}
+                      >
+                        ...
+                      </span>
+                    );
+                  }
+
+                  // Standard page links (Next, Last, page numbers)
+                  const targetPage = pag.page || '1';
+                  return (
+                    <Link
+                      key={idx}
+                      href={`/batch-list?page=${targetPage}`}
+                      className="btn-mirror"
+                      style={{
+                        padding: '0.5rem 0.95rem',
+                        fontSize: '0.8rem',
+                        borderRadius: '8px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        borderColor: 'rgba(255, 255, 255, 0.05)',
+                        transition: 'var(--transition-smooth)'
+                      }}
+                    >
+                      {pag.text.replace('&raquo;', '»').replace('&laquo;', '«')}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </>
         )}
       </div>
