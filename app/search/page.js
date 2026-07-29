@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 function SearchPageClient() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const query = searchParams.get('q') || '';
 
   const [otakudesuResults, setOtakudesuResults] = useState([]);
@@ -36,6 +37,14 @@ function SearchPageClient() {
           : Promise.resolve([]);
 
         const [otaku, kuso] = await Promise.all([fetchOtakudesu, fetchKusonime]);
+        
+        // Check if there is a direct redirect item
+        const redirectItem = otaku.find(item => item.redirect);
+        if (redirectItem && redirectItem.slug) {
+          router.replace(`/anime/${redirectItem.slug}`);
+          return;
+        }
+
         setOtakudesuResults(otaku);
         setKusonimeResults(kuso);
       } catch (err) {
@@ -46,7 +55,7 @@ function SearchPageClient() {
     }
 
     fetchResults();
-  }, [query]);
+  }, [query, router]);
 
   // Filter items based on active tab
   const showStreaming = activeTab === 'all' || activeTab === 'streaming';

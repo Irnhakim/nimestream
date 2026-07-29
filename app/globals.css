@@ -648,6 +648,21 @@ footer span {
   color: #d1d5db;
 }
 
+.synopsis-box a {
+  color: var(--color-candy-cyan);
+  text-decoration: underline;
+  font-weight: 600;
+  transition: var(--transition-smooth);
+}
+
+.synopsis-box a:hover {
+  color: var(--color-candy-pink);
+}
+
+.synopsis-box br {
+  margin-bottom: 0.5rem;
+}
+
 .episode-list {
   display: flex;
   flex-direction: column;

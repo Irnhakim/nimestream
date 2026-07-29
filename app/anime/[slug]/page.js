@@ -54,9 +54,10 @@ export default async function AnimeDetailsPage({ params }) {
           {anime.sinopsis && (
             <div>
               <h2 className="section-title">Sinopsis</h2>
-              <div className="synopsis-box">
-                <p>{anime.sinopsis}</p>
-              </div>
+              <div 
+                className="synopsis-box" 
+                dangerouslySetInnerHTML={{ __html: anime.sinopsis }}
+              />
             </div>
           )}
 
