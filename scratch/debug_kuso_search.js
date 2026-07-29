@@ -12,17 +12,11 @@ let html = '';
 https.get(options, res => {
   res.on('data', chunk => html += chunk);
   res.on('end', () => {
-    const startIdx = html.indexOf('class="kover"');
+    const startIdx = html.indexOf('class="content"');
     if (startIdx !== -1) {
-      console.log("DUMP kover:\n", html.substring(startIdx, startIdx + 1200));
+      console.log("DUMP content:\n", html.substring(startIdx - 100, startIdx + 800));
     } else {
-      const startIdx2 = html.indexOf('class="thumb"');
-      if (startIdx2 !== -1) {
-        console.log("DUMP thumb:\n", html.substring(startIdx2 - 100, startIdx2 + 1000));
-      } else {
-        console.log("Not found. Dumping 1000 chars of HTML:");
-        console.log(html.substring(0, 1000));
-      }
+      console.log("Not found.");
     }
   });
 }).on('error', e => console.error(e));

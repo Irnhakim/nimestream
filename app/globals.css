@@ -413,13 +413,13 @@ footer span {
 .card-title {
   font-size: 0.8rem;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.35;
   margin-bottom: 0.4rem;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3; /* Allow up to 3 lines on desktop */
   -webkit-box-orient: vertical;
   overflow: hidden;
-  height: 2.1rem;
+  min-height: 2.1rem; /* Minimum height for consistency */
   color: var(--text-main);
   transition: var(--transition-smooth);
 }
@@ -497,7 +497,8 @@ footer span {
   }
   .card-title {
     font-size: 0.75rem;
-    height: 2.1rem;
+    min-height: 2rem;
+    -webkit-line-clamp: 3;
   }
   .card-badge {
     top: 0.4rem;
