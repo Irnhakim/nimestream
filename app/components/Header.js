@@ -9,6 +9,7 @@ const navLinks = [
   { href: '/anime-list', label: 'ANIME LIST' },
   { href: '/jadwal-rilis', label: 'JADWAL RILIS' },
   { href: '/ongoing-anime', label: 'ON-GOING' },
+  { href: '/batch-list', label: 'BATCH LIST' },
   { href: '/genre-list', label: 'GENRE LIST' },
 ];
 

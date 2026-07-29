@@ -42,7 +42,7 @@ export default async function Home() {
 
       {/* Kusonime Batch Section */}
       {process.env.NEXT_PUBLIC_KUSONIME_ENABLED === 'true' && latestBatch.length > 0 && (
-        <AnimeGrid title="Anime Batch Terbaru" items={latestBatch} isBatch={true} />
+        <AnimeGrid title="Anime Batch Terbaru" items={latestBatch} isBatch={true} moreLink="/batch-list" />
       )}
     </main>
   );
