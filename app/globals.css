@@ -485,6 +485,9 @@ footer span {
   .hamburger-btn {
     display: flex;
   }
+  .mobile-controls-wrap {
+    display: flex !important;
+  }
   .mobile-menu {
     display: flex;
   }

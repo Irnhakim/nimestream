@@ -62,40 +62,45 @@ export default async function AnimeListPage() {
               </h2>
               
               <div className="anime-list-grid">
-                {list[char].map((anime, idx) => (
-                  <Link
-                    key={idx}
-                    href={`/anime/${anime.slug}`}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '0.75rem 1rem',
-                      backgroundColor: 'var(--bg-card)',
-                      borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.02)',
-                      fontSize: '0.9rem',
-                      fontWeight: '500',
-                      transition: 'var(--transition-smooth)'
-                    }}
-                    className="anime-list-item-link"
-                  >
-                    <span style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      backgroundColor: 'var(--color-candy-cyan)',
-                      marginRight: '0.75rem',
-                      flexShrink: 0
-                    }}></span>
-                    <span style={{
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {anime.title}
-                    </span>
-                  </Link>
-                ))}
+                 {list[char].map((anime, idx) => {
+                   const targetUrl = anime.isKusoBatch 
+                     ? `/batch/kuso/${anime.slug}` 
+                     : `/anime/${anime.slug}`;
+                   return (
+                     <Link
+                       key={idx}
+                       href={targetUrl}
+                       style={{
+                         display: 'flex',
+                         alignItems: 'center',
+                         padding: '0.75rem 1rem',
+                         backgroundColor: 'var(--bg-card)',
+                         borderRadius: '8px',
+                         border: anime.isKusoBatch ? '1px solid rgba(176, 92, 255, 0.15)' : '1px solid rgba(255, 255, 255, 0.02)',
+                         fontSize: '0.9rem',
+                         fontWeight: '500',
+                         transition: 'var(--transition-smooth)'
+                       }}
+                       className="anime-list-item-link"
+                     >
+                       <span style={{
+                         width: '6px',
+                         height: '6px',
+                         borderRadius: '50%',
+                         backgroundColor: anime.isKusoBatch ? 'var(--color-candy-purple)' : 'var(--color-candy-cyan)',
+                         marginRight: '0.75rem',
+                         flexShrink: 0
+                       }}></span>
+                       <span style={{
+                         overflow: 'hidden',
+                         textOverflow: 'ellipsis',
+                         whiteSpace: 'nowrap'
+                       }}>
+                         {anime.title}
+                       </span>
+                     </Link>
+                   );
+                 })}
               </div>
             </div>
           ))}
