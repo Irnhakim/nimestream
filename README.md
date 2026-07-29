@@ -1,18 +1,19 @@
 # NimeStream 🌌
 
-NimeStream adalah platform website streaming anime modern berkinerja tinggi yang melakukan **scraping data secara realtime** dari [Otakudesu](https://otakudesu.blog/). Dibangun menggunakan **Next.js App Router** dan dirancang secara visual dengan tema **Candy Dark Mode** yang premium, futuristik, dan responsif.
+NimeStream adalah platform website streaming anime modern berkinerja tinggi yang melakukan **scraping data secara realtime** dari [Otakudesu](https://otakudesu.blog/) dan mengintegrasikan link download batch dari [Kusonime](https://kusonime.com/). Dibangun menggunakan **Next.js App Router** 
 
 ---
 
 ## ✨ Fitur Utama
 
-- 🏠 **Beranda Interaktif**: Daftar grid anime *On-Going* (sedang tayang) dan *Completed* (tamat).
-- 📅 **Jadwal Rilis Mingguan**: Menampilkan daftar rilis harian anime dari Senin sampai Minggu.
-- 🔠 **Indeks Anime A-Z**: Navigasi alfabetik instan untuk mencari judul anime favorit Anda.
+- 🏠 **Beranda Interaktif**: Daftar grid anime *On-Going* (sedang tayang), *Completed* (tamat), dan *Kusonime Batch* terbaru.
+- 📅 **Jadwal Rilis Mingguan**: Menampilkan daftar rilis harian anime terintegrasi langsung dengan **AniList API** untuk pencocokan jam WIB otomatis.
+- 🔠 **Indeks Anime A-Z**: Navigasi alfabetik terpadu yang menggabungkan database anime Otakudesu dan Kusonime dengan sistem deduplikasi judul.
 - 🏷️ **Daftar & Filter Genre**: Telusuri anime berdasarkan genre/kategori dengan sistem paginasi yang rapi.
-- 🎥 **Video Stream Switcher**: Pemutar video dinamis dengan fitur pergantian mirror server (DesuUpload, StreamSB, dll.) secara *client-side*.
-- 📥 **Unduh Episode & Batch**: Link download langsung terstruktur per episode beserta link download Batch lengkap untuk mengunduh semua episode sekaligus.
-- 🌐 **Domain-Change Ready**: Dikonfigurasi secara dinamis untuk memudahkan perubahan domain Otakudesu melalui file konfigurasi tanpa menyentuh source code inti.
+- 🎥 **Video Stream Switcher**: Pemutar video dinamis dengan fitur pergantian mirror server secara *client-side*.
+- 📥 **Unduh Episode & Batch**: Link download terstruktur per episode beserta block tabel link download **Batch (Kusonime & Otakudesu)**.
+- 🟢 **Real-time Online Counter**: Widget premium pada Header untuk memantau jumlah user aktif yang sedang membuka situs secara real-time.
+- 🌐 **Domain-Change Ready**: Dikonfigurasi secara dinamis untuk memudahkan perubahan domain asal melalui file `.env.local`.
 
 ---
 
@@ -20,8 +21,9 @@ NimeStream adalah platform website streaming anime modern berkinerja tinggi yang
 
 - **Framework**: [Next.js (React)](https://nextjs.org/)
 - **Scraper Engine**: [Cheerio](https://cheerio.js.org/) (Realtime HTML Parsing)
-- **Styling**: Vanilla CSS (kustom, tanpa framework utility eksternal untuk kontrol performa penuh)
-- **Rute API**: Next.js Route Handlers (Backend API endpoints)
+- **Database Schedule & Time**: [AniList GraphQL API](https://anilist.co/)
+- **Styling**: Vanilla CSS (kustom Candy Dark Mode, interaksi mikro-animasi premium)
+- **Rute API**: Next.js Route Handlers (Backend API endpoints untuk heartbeat online counter dan scraper data)
 
 ---
 
@@ -39,10 +41,12 @@ Pastikan Anda sudah menginstal Node.js versi terbaru (direkomendasikan v18+).
 npm install
 ```
 
-### 3. Konfigurasi Domain Scraper (Opsional)
-Salin atau edit file `.env.local` pada direktori root untuk menyesuaikan domain Otakudesu:
+### 3. Konfigurasi File Environment
+Salin atau edit file `.env.local` pada direktori root untuk menyesuaikan domain sumber:
 ```env
 NEXT_PUBLIC_OTAKUDESU_URL=https://otakudesu.blog
+NEXT_PUBLIC_KUSONIME_ENABLED=true
+NEXT_PUBLIC_KUSONIME_URL=https://kusonime.com
 ```
 
 ### 4. Jalankan Server Development
@@ -54,7 +58,6 @@ Buka browser Anda dan akses di [http://localhost:3006](http://localhost:3006).
 ### 5. Build untuk Produksi
 ```bash
 npm run build
-npm run start
 ```
 
 ---
@@ -63,22 +66,22 @@ npm run start
 
 ```text
 ├── app/                  # Direktori utama Next.js (App Router)
-│   ├── api/              # Route Handlers backend untuk scraper endpoint
-│   ├── anime/            # Halaman detail anime
-│   ├── anime-list/       # Halaman daftar anime alfabetikal
-│   ├── batch/            # Halaman download batch
+│   ├── api/              # Route Handlers (Scraper Otakudesu/Kusonime & Heartbeat Online Counter)
+│   ├── anime/            # Halaman detail anime (Menampilkan link batch terintegrasi)
+│   ├── anime-list/       # Halaman daftar anime alfabetikal gabungan + deduplikasi
+│   ├── batch/            # Halaman download batch Otakudesu & Kusonime
+│   ├── batch-list/       # Halaman list batch terbaru dengan Page Navigator lengkap
 │   ├── episode/          # Halaman nonton video streaming & download
 │   ├── genre-list/       # Halaman kategori genre
 │   ├── genres/           # Halaman daftar anime per genre (paginated)
-│   ├── jadwal-rilis/     # Halaman jadwal rilis mingguan
-│   └── ongoing-anime/    # Halaman list ongoing anime (paginated)
-├── components/           # Komponen reusable frontend (Header, AnimeGrid, Player)
-├── lib/                  # Logika core scraper & fetch helper (scraper.js)
-├── public/               # File statik & gambar aset banner
-└── globals.css           # Desain kustom Candy Dark Mode
+│   └── jadwal-rilis/     # Halaman jadwal rilis mingguan dengan jam tayang AniList
+├── components/           # Komponen reusable (Header, OnlineUsersCounter, KusonimeBatchLink)
+├── lib/                  # Logika core scraper (scraper.js, kusonimeScraper.js)
+├── public/               # File statik & gambar aset logo
+└── globals.css           # Desain kustom Candy Dark Mode & mikro-animasi
 ```
 
 ---
 
 ## ⚠️ Disclaimer
-Project ini dibuat hanya untuk tujuan edukasi dan pembelajaran teknik *web scraping*. Seluruh hak cipta konten anime dan media sepenuhnya milik sumber asli (Otakudesu) dan pemilik lisensi masing-masing.
+Project ini dibuat hanya untuk tujuan edukasi dan pembelajaran teknik *web scraping*. Seluruh hak cipta konten anime dan media sepenuhnya milik sumber asli (Otakudesu, Kusonime, & AniList) dan pemilik lisensi masing-masing.
