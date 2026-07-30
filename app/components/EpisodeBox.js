@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-export default function EpisodeBox({ episodes }) {
+export default function EpisodeBox({ episodes, animeTitle = '' }) {
   const [search, setSearch] = useState('');
   const [order, setOrder] = useState('desc'); // desc = terbaru dulu
 
@@ -11,6 +11,34 @@ export default function EpisodeBox({ episodes }) {
   const filtered = search.trim()
     ? sorted.filter(ep => ep.title.toLowerCase().includes(search.toLowerCase()))
     : sorted;
+
+  // Helper function to clean title by removing redundant parent anime name and tags
+  const cleanEpisodeTitle = (title) => {
+    if (!title) return '';
+    let cleaned = title;
+
+    if (animeTitle) {
+      // Create a normalized search regex for the anime title
+      const escapedTitle = animeTitle
+        .replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+        .trim();
+      const titleRegex = new RegExp(escapedTitle, 'i');
+      cleaned = cleaned.replace(titleRegex, '');
+    }
+
+    // Clean common Otakudesu trailing words
+    cleaned = cleaned
+      .replace(/Subtitle\s*Indonesia/gi, '')
+      .replace(/Sub\s*Indo/gi, '')
+      .replace(/^\s*-\s*/, '') // Remove starting dashes
+      .trim();
+
+    // If everything got cleaned, fallback to original
+    if (!cleaned) return title;
+
+    // Capitalize first letter of Episode
+    return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  };
 
   return (
     <div className="episode-box">
@@ -62,7 +90,7 @@ export default function EpisodeBox({ episodes }) {
         ) : (
           filtered.map((ep, idx) => (
             <Link key={idx} href={`/episode/${ep.slug}`} className="episode-item">
-              <span className="episode-title">{ep.title}</span>
+              <span className="episode-title">{cleanEpisodeTitle(ep.title)}</span>
               <span className="episode-date">{ep.date}</span>
             </Link>
           ))

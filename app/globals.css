@@ -1157,9 +1157,8 @@ footer span {
   font-weight: 500;
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .episode-date {
