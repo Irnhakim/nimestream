@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
-export default function PageProgressBar() {
+function ProgressBarInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [progress, setProgress] = useState(0);
@@ -90,5 +90,13 @@ export default function PageProgressBar() {
         pointerEvents: 'none'
       }}
     />
+  );
+}
+
+export default function PageProgressBar() {
+  return (
+    <Suspense fallback={null}>
+      <ProgressBarInner />
+    </Suspense>
   );
 }
