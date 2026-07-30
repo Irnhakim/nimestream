@@ -1,6 +1,7 @@
 import './globals.css';
 import Header from './components/Header';
 import PopunderAd from './components/PopunderAd';
+import PageProgressBar from './components/PageProgressBar';
 
 export const metadata = {
   title: 'NimeStream - Nonton & Streaming Anime Subtitle Indonesia',
@@ -45,6 +46,7 @@ export default function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
       <body>
+        <PageProgressBar />
         <Header />
         <PopunderAd />
         {children}
