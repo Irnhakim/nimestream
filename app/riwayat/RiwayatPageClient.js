@@ -44,8 +44,12 @@ export default function RiwayatPageClient() {
     <div className="section-wrapper">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2.5rem' }}>
         <div>
-          <h1 className="section-title" style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span>🕒</span> Riwayat Tontonan
+          <h1 className="section-title" style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-candy-purple)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            Riwayat Tontonan
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             Daftar anime yang baru saja Anda tonton (data disimpan secara lokal di perangkat Anda).
@@ -63,10 +67,17 @@ export default function RiwayatPageClient() {
               padding: '0.5rem 1rem',
               fontSize: '0.8rem',
               borderRadius: '8px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem'
             }}
           >
-            🗑️ Hapus Semua
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+            </svg>
+            Hapus Semua
           </button>
         )}
       </div>
@@ -80,11 +91,19 @@ export default function RiwayatPageClient() {
             borderRadius: '16px',
             padding: '4rem 2rem',
             textAlign: 'center',
-            color: 'var(--text-muted)'
+            color: 'var(--text-muted)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.5rem'
           }}
         >
-          <span style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }}>📺</span>
-          <p style={{ fontWeight: '600', marginBottom: '0.5rem' }}>Belum ada riwayat tontonan.</p>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '0.5rem', opacity: 0.7 }}>
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+          </svg>
+          <p style={{ fontWeight: '600', marginBottom: '0.2rem', color: 'var(--text-main)' }}>Belum ada riwayat tontonan.</p>
           <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>Silakan buka episode streaming anime untuk mulai merekam riwayat.</p>
         </div>
       ) : (

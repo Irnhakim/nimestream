@@ -28,8 +28,11 @@ export default function ResumeWatchingBlock() {
   return (
     <div className="section-wrapper" style={{ marginTop: '2rem', paddingBottom: '0.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-        <h2 className="section-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <span>🔄</span> Lanjutkan Menonton
+        <h2 className="section-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-candy-cyan)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Lanjutkan Menonton
         </h2>
         <Link 
           href="/riwayat" 
@@ -38,10 +41,16 @@ export default function ResumeWatchingBlock() {
             padding: '0.35rem 0.75rem', 
             fontSize: '0.75rem', 
             borderColor: 'rgba(255,255,255,0.05)',
-            backgroundColor: 'rgba(255,255,255,0.02)'
+            backgroundColor: 'rgba(255,255,255,0.02)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.25rem'
           }}
         >
-          Lihat Semua &rarr;
+          Lihat Semua 
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 5l7 7-7 7" />
+          </svg>
         </Link>
       </div>
 

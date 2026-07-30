@@ -77,8 +77,11 @@ export default async function JadwalRilisPage() {
           Berikut adalah jadwal rilis mingguan untuk anime yang sedang tayang (on-going).
         </p>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <span style={{ color: 'var(--color-candy-purple)', fontWeight: '700' }}>🕐</span>
-          Jam tayang dalam <strong style={{ color: 'var(--color-candy-pink)' }}>WIB (UTC+7)</strong> — diambil dari MyAnimeList. Sebagian anime mungkin tidak memiliki data jam.
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-candy-purple)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          Jam tayang dalam <strong style={{ color: 'var(--color-candy-pink)' }}>WIB (UTC+7)</strong> — diambil dari AniList. Sebagian anime mungkin tidak memiliki data jam.
         </p>
 
         <div className="schedule-grid">
@@ -147,22 +150,12 @@ export default async function JadwalRilisPage() {
                         <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {anime.title}
                         </span>
-                        {wibTime && (
-                          <span style={{
-                            flexShrink: 0,
-                            fontSize: '0.75rem',
-                            fontWeight: '700',
-                            color: 'var(--color-candy-pink)',
-                            backgroundColor: 'rgba(255, 96, 151, 0.1)',
-                            border: '1px solid rgba(255, 96, 151, 0.2)',
-                            padding: '0.15rem 0.45rem',
-                            borderRadius: '5px',
-                            fontVariantNumeric: 'tabular-nums',
-                            letterSpacing: '0.02em'
-                          }}>
-                            🕐 {wibTime} WIB
-                          </span>
-                        )}
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', marginTop: '-2px' }}>
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                          </svg>
+                          {" " + wibTime} WIB
+                        </span>
                       </Link>
                     );
                   })}
