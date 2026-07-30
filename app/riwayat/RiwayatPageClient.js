@@ -88,7 +88,7 @@ export default function RiwayatPageClient() {
           <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>Silakan buka episode streaming anime untuk mulai merekam riwayat.</p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="history-list-container">
           {history.map((item, idx) => {
             // Format full date time display: DD/M/YYYY, HH.MM.SS
             const watchedDate = new Date(item.watchedAt);
@@ -97,105 +97,47 @@ export default function RiwayatPageClient() {
             return (
               <div 
                 key={idx}
-                style={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1.25rem',
-                  padding: '1rem',
-                  backgroundColor: 'var(--bg-card)',
-                  border: '1px solid rgba(176, 92, 255, 0.15)',
-                  borderRadius: '12px',
-                  position: 'relative',
-                  transition: 'var(--transition-smooth)'
-                }}
                 className="history-list-row"
               >
                 {/* Anime Cover (Portrait Layout) */}
-                <div 
-                  style={{ 
-                    width: '140px', 
-                    height: '80px', 
-                    borderRadius: '8px', 
-                    overflow: 'hidden', 
-                    flexShrink: 0,
-                    position: 'relative'
-                  }}
-                >
+                <div className="history-row-img-wrapper">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.thumb ? `/api/img?url=${encodeURIComponent(item.thumb)}` : '/placeholder.svg'}
                     alt={item.animeTitle}
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'cover',
-                      objectPosition: 'center 20%'
-                    }}
+                    className="history-row-img"
                     loading="lazy"
                   />
                 </div>
 
                 {/* Middle Info Details */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3 
-                    style={{ 
-                      fontSize: '0.95rem', 
-                      fontWeight: '700', 
-                      color: 'var(--text-main)',
-                      marginBottom: '0.35rem',
-                      lineHeight: '1.3',
-                      wordBreak: 'break-word',
-                      marginTop: '0.2rem'
-                    }}
-                  >
+                <div className="history-row-info">
+                  <h3 className="history-row-title">
                     {item.animeTitle} {item.episodeTitle}
                   </h3>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      {item.episodeTitle} <span style={{ opacity: 0.5 }}>·</span> Baru ditonton
+                  <div className="history-row-meta">
+                    <p className="history-row-subtitle">
+                      {item.episodeTitle} <span className="dot-divider">·</span> Baru ditonton
                     </p>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', opacity: 0.8 }}>
+                    <p className="history-row-date">
                       {dateStr}
                     </p>
                   </div>
                 </div>
 
                 {/* Right Actions */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center', minWidth: '95px', flexShrink: 0 }}>
+                <div className="history-row-actions">
                   <Link 
                     href={`/episode/${item.slug}`}
-                    className="btn-mirror"
-                    style={{
-                      padding: '0.45rem 1rem',
-                      fontSize: '0.8rem',
-                      fontWeight: '700',
-                      borderRadius: '8px',
-                      backgroundColor: 'white',
-                      borderColor: 'white',
-                      color: 'black',
-                      textAlign: 'center',
-                      width: '100%',
-                      boxShadow: '0 4px 12px rgba(255, 255, 255, 0.1)'
-                    }}
+                    className="btn-continue-watch"
                   >
                     Lanjutkan
                   </Link>
 
                   <button
                     onClick={() => handleDeleteItem(item.slug)}
-                    style={{
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      color: 'var(--text-muted)',
-                      fontSize: '0.8rem',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'color 0.2s',
-                      padding: '0.25rem'
-                    }}
-                    onMouseEnter={(e) => e.target.style.color = 'var(--color-candy-pink)'}
-                    onMouseLeave={(e) => e.target.style.color = 'var(--text-muted)'}
+                    className="btn-delete-history"
                   >
                     Hapus
                   </button>

@@ -1168,3 +1168,178 @@ footer span {
   white-space: nowrap;
   flex-shrink: 0;
 }
+
+/* ==========================================================================
+   Watch History Page Styles (Desktop & Responsive Mobile)
+   ========================================================================== */
+
+.history-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.history-list-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem;
+  background-color: var(--bg-card);
+  border: 1px solid rgba(176, 92, 255, 0.12);
+  border-radius: 14px;
+  position: relative;
+  transition: var(--transition-smooth);
+}
+
+.history-list-row:hover {
+  border-color: rgba(176, 92, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(176, 92, 255, 0.05);
+}
+
+.history-row-img-wrapper {
+  width: 140px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.history-row-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.history-row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-row-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.history-row-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.history-row-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.history-row-subtitle .dot-divider {
+  opacity: 0.5;
+  margin: 0 0.2rem;
+}
+
+.history-row-date {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.history-row-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  min-width: 110px;
+  flex-shrink: 0;
+}
+
+.btn-continue-watch {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 8px;
+  background-color: white;
+  border: 1px solid white;
+  color: black;
+  text-align: center;
+  text-decoration: none;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.08);
+  transition: var(--transition-smooth);
+}
+
+.btn-continue-watch:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.15);
+}
+
+.btn-delete-history {
+  background-color: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0.25rem 0.75rem;
+}
+
+.btn-delete-history:hover {
+  color: var(--color-candy-pink);
+}
+
+/* Mobile responsive media query for Riwayat page */
+@media (max-width: 640px) {
+  .history-list-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .history-row-img-wrapper {
+    width: 100%;
+    height: 140px; /* Horizontal wide banner style on mobile to save vertical reading space */
+  }
+
+  .history-row-img {
+    object-position: center 25%;
+  }
+
+  .history-row-title {
+    font-size: 0.95rem;
+    line-height: 1.35;
+    margin-bottom: 0.35rem;
+  }
+
+  .history-row-actions {
+    flex-direction: row;
+    width: 100%;
+    min-width: unset;
+    gap: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    padding-top: 0.75rem;
+    justify-content: space-between;
+  }
+
+  .btn-continue-watch {
+    flex: 1;
+    padding: 0.55rem;
+  }
+
+  .btn-delete-history {
+    flex-shrink: 0;
+    padding: 0.55rem 1rem;
+    border: 1px solid rgba(255, 96, 151, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 96, 151, 0.04);
+    color: var(--color-candy-pink);
+    text-align: center;
+  }
+}
+
