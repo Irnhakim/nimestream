@@ -53,30 +53,31 @@ header {
 .header-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0.75rem 1.25rem;
+  padding: 0.95rem 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.2rem; /* Sweet balanced spacing spacing */
 }
 
 .nav-link {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
   transition: var(--transition-smooth);
   position: relative;
-  padding: 0.25rem 0;
+  padding: 0.4rem 0.2rem;
 }
 
 .nav-link:hover {
-  color: var(--color-candy-pink);
+  color: var(--color-candy-cyan);
 }
 
 .nav-link.active {
@@ -86,12 +87,13 @@ header {
 .nav-link.active::after {
   content: '';
   position: absolute;
-  bottom: -4px;
+  bottom: -6px;
   left: 0;
   width: 100%;
-  height: 2px;
+  height: 2.5px;
   background-color: var(--color-candy-cyan);
   border-radius: 9999px;
+  box-shadow: 0 0 8px rgba(60, 212, 255, 0.6);
 }
 
 .logo {

@@ -45,14 +45,14 @@ export default function AnimeGrid({ title, items, moreLink, isBatch }) {
                       </div>
                     )}
                     {item.dayOrRating && (
-                      <div className="card-badge-sub" style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                      <div className="card-badge-sub" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '0.25rem 0.5rem' }}>
                         {/* If it looks like a score rating (e.g. 7.85 or containing digits), render a yellow star */}
                         {/^\d+(\.\d+)?$/.test(item.dayOrRating) && (
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="#ffdd3c" stroke="#ffdd3c" strokeWidth="1" style={{ display: 'inline-block', flexShrink: 0 }}>
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="#ffd54f" stroke="#ffd54f" strokeWidth="1" style={{ display: 'inline-block', flexShrink: 0, marginTop: '-1px' }}>
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                           </svg>
                         )}
-                        {item.dayOrRating}
+                        <span>{item.dayOrRating}</span>
                       </div>
                     )}
                   </>
