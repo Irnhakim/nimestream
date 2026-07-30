@@ -31,6 +31,18 @@ body {
   flex-direction: column;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  animation: pageFadeIn 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 a {
@@ -350,9 +362,9 @@ footer span {
 }
 
 .anime-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-6px) scale(1.02);
   border-color: var(--color-candy-purple);
-  box-shadow: 0 10px 25px rgba(176, 92, 255, 0.15);
+  box-shadow: 0 12px 30px rgba(176, 92, 255, 0.22), 0 0 15px rgba(60, 212, 255, 0.1);
 }
 
 .card-img-wrapper {
