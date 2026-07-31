@@ -1,15 +1,14 @@
 import { fetchHtml, parseAnimeList } from '@/lib/scraper';
 import { getKusonimeAnimeList, KUSONIME_ENABLED } from '@/lib/kusonimeScraper';
+import { getFileCache, setFileCache } from '@/lib/fileCache';
 
-// Long term cache for full merged A-Z Anime List (TTL 3 days)
-let animelistCache = null;
-let animelistCacheTime = 0;
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+const CACHE_KEY = 'merged_animelist';
 
 export async function GET() {
-  const now = Date.now();
-  if (animelistCache && (now - animelistCacheTime < THREE_DAYS_MS)) {
-    return Response.json(animelistCache);
+  const cachedData = getFileCache(CACHE_KEY, THREE_DAYS_MS);
+  if (cachedData) {
+    return Response.json(cachedData);
   }
 
   try {
@@ -63,9 +62,8 @@ export async function GET() {
       }
     });
 
-    // Cache the merged list
-    animelistCache = mergedList;
-    animelistCacheTime = now;
+    // Cache the merged list to disk
+    setFileCache(CACHE_KEY, mergedList);
 
     return Response.json(mergedList);
   } catch (error) {

@@ -1,23 +1,21 @@
 import { fetchHtml, parseGenreList } from '@/lib/scraper';
+import { getFileCache, setFileCache } from '@/lib/fileCache';
 
-// Long-term cache for Genre list (TTL 1 month)
-let genresCache = null;
-let genresCacheTime = 0;
 const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+const CACHE_KEY = 'genre_list';
 
 export async function GET() {
-  const now = Date.now();
-  if (genresCache && (now - genresCacheTime < ONE_MONTH_MS)) {
-    return Response.json(genresCache);
+  const cachedData = getFileCache(CACHE_KEY, ONE_MONTH_MS);
+  if (cachedData) {
+    return Response.json(cachedData);
   }
 
   try {
     const html = await fetchHtml('https://otakudesu.blog/genre-list/');
     const data = parseGenreList(html);
     
-    // Save to cache
-    genresCache = data;
-    genresCacheTime = now;
+    // Save to disk cache
+    setFileCache(CACHE_KEY, data);
 
     return Response.json(data);
   } catch (error) {

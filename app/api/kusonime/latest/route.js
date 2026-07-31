@@ -1,28 +1,23 @@
 import { getLatestKusonime } from '@/lib/kusonimeScraper';
+import { getFileCache, setFileCache } from '@/lib/fileCache';
 
-// In-memory cache for latest Kusonime pages (TTL 1 day)
-const kusoLatestCache = new Map();
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const page = searchParams.get('page') || '1';
-  const pageKey = `page_${page}`;
+  const cacheKey = `kuso_latest_page_${page}`;
 
-  const now = Date.now();
-  const cached = kusoLatestCache.get(pageKey);
-  if (cached && (now - cached.timestamp < ONE_DAY_MS)) {
-    return Response.json(cached.data);
+  const cachedData = getFileCache(cacheKey, ONE_DAY_MS);
+  if (cachedData) {
+    return Response.json(cachedData);
   }
 
   try {
     const data = await getLatestKusonime(parseInt(page, 10));
     
-    // Save to cache
-    kusoLatestCache.set(pageKey, {
-      timestamp: now,
-      data
-    });
+    // Save to disk cache
+    setFileCache(cacheKey, data);
 
     return Response.json(data);
   } catch (error) {
