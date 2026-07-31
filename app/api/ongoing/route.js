@@ -1,13 +1,13 @@
 import { fetchHtml, parseHomeList } from '@/lib/scraper';
 
-// Daily cache for Ongoing list (TTL 1 day)
+// Cache for Ongoing list (TTL 1 hour)
 let ongoingCache = null;
 let ongoingCacheTime = 0;
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const ONE_HOUR_MS = 1 * 60 * 60 * 1000;
 
 export async function GET() {
   const now = Date.now();
-  if (ongoingCache && (now - ongoingCacheTime < ONE_DAY_MS)) {
+  if (ongoingCache && (now - ongoingCacheTime < ONE_HOUR_MS)) {
     return Response.json(ongoingCache);
   }
 
