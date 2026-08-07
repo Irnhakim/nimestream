@@ -12,7 +12,7 @@ const navLinks = [
   { href: '/ongoing-anime', label: 'ON-GOING' },
   { href: '/batch-list', label: 'BATCH LIST' },
   { href: '/genre-list', label: 'GENRE LIST' },
-  { href: '/riwayat', label: 'RIWAYAT' },
+  { href: '/riwayat', label: 'WATCHLIST' },
 ];
 
 export default function Header() {
