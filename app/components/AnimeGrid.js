@@ -62,13 +62,26 @@ export default function AnimeGrid({ title, items, moreLink, isBatch }) {
                 <h3 className="card-title" title={item.title}>
                   {item.title}
                 </h3>
-                <div className="card-meta">
+                <div className="card-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   {item.date && (
                     <span>
                       <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{width: '12px', height: '12px'}}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                       </svg>
                       {item.date}
+                    </span>
+                  )}
+                  {(item.source === 'Oploverz' || (item.slug && item.slug.startsWith('oploverz-'))) && (
+                    <span style={{ 
+                      fontSize: '0.65rem', 
+                      backgroundColor: 'rgba(60, 212, 255, 0.15)', 
+                      color: 'var(--color-candy-cyan)', 
+                      padding: '0.15rem 0.4rem', 
+                      borderRadius: '4px',
+                      fontWeight: '700',
+                      border: '1px solid rgba(60, 212, 255, 0.25)'
+                    }}>
+                      OPLOVERZ
                     </span>
                   )}
                 </div>

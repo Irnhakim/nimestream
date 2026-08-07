@@ -1,10 +1,25 @@
 import { fetchHtml, parseAnimeDetails } from '@/lib/scraper';
 import { getFileCache } from '@/lib/fileCache';
+import { getOploverzDetails } from '@/lib/oploverzScraper';
 
 export async function GET(request, { params }) {
   const { slug } = await params;
   if (!slug) {
     return Response.json({ error: 'Missing slug' }, { status: 400 });
+  }
+
+  // Route routing for Oploverz source
+  if (slug.startsWith('oploverz-')) {
+    try {
+      const realSlug = slug.replace('oploverz-', '');
+      const data = await getOploverzDetails(realSlug);
+      if (!data) {
+        return Response.json({ error: 'Anime not found on Oploverz' }, { status: 404 });
+      }
+      return Response.json(data);
+    } catch (e) {
+      return Response.json({ error: e.message }, { status: 500 });
+    }
   }
 
   try {

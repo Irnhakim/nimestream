@@ -1,9 +1,31 @@
 import { fetchHtml, parseEpisodeDetails } from '@/lib/scraper';
+import { getOploverzEpisode } from '@/lib/oploverzScraper';
 
 export async function GET(request, { params }) {
   const { slug } = await params;
   if (!slug) {
     return Response.json({ error: 'Missing slug' }, { status: 400 });
+  }
+
+  // Route matching for Oploverz source
+  if (slug.startsWith('oploverz-')) {
+    try {
+      // Expected slug format: oploverz-{seriesSlug}-episode-{epNumber}
+      const match = slug.match(/^oploverz-([a-z0-9-]+)-episode-([0-9.]+)$/i);
+      if (!match) {
+        return Response.json({ error: 'Invalid Oploverz episode slug format' }, { status: 400 });
+      }
+      
+      const seriesSlug = match[1];
+      const epNumber = match[2];
+      const data = await getOploverzEpisode(seriesSlug, epNumber);
+      if (!data) {
+        return Response.json({ error: 'Episode not found on Oploverz' }, { status: 404 });
+      }
+      return Response.json(data);
+    } catch (e) {
+      return Response.json({ error: e.message }, { status: 500 });
+    }
   }
 
   try {
