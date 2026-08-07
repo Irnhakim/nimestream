@@ -903,9 +903,16 @@ footer span {
   color: white;
 }
 
+/* Desktop Grid columns for Download Box */
+.download-box {
+  grid-column: 1;
+}
+
 @media (max-width: 1024px) {
   .stream-container {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
   .detail-container {
     grid-template-columns: 200px 1fr;
@@ -914,9 +921,6 @@ footer span {
 }
 
 @media (max-width: 768px) {
-  .stream-container {
-    grid-template-columns: 1fr;
-  }
   .detail-container {
     grid-template-columns: 1fr;
     gap: 1.25rem;

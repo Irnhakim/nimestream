@@ -93,31 +93,6 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
             )}
           </div>
         </div>
-
-        {/* Download Section */}
-        {episode.downloads.length > 0 && (
-          <div className="download-box">
-            <h3 className="section-title">Download Episode</h3>
-            {episode.downloads.map((dl, idx) => (
-              <div key={idx} className="download-row">
-                <span className="download-quality">{dl.quality}</span>
-                <div className="download-links">
-                  {dl.links.map((link, j) => (
-                    <a
-                      key={j}
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-download"
-                    >
-                      {link.server}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Sidebar Server Selector */}
@@ -147,6 +122,31 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
           ))
         )}
       </div>
+
+      {/* Download Section (Moved to be a direct sibling of main wrapper and mirror-panel) */}
+      {episode.downloads.length > 0 && (
+        <div className="download-box">
+          <h3 className="section-title">Download Episode</h3>
+          {episode.downloads.map((dl, idx) => (
+            <div key={idx} className="download-row">
+              <span className="download-quality">{dl.quality}</span>
+              <div className="download-links">
+                {dl.links.map((link, j) => (
+                  <a
+                    key={j}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-download"
+                  >
+                    {link.server}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
