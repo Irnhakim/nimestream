@@ -36,15 +36,51 @@ export async function GET(request) {
     const otakuData = otakuResult.status === 'fulfilled' ? otakuResult.value : [];
     const oploverzData = oploverzResult.status === 'fulfilled' ? oploverzResult.value : [];
 
-    // Prepend 'oploverz-' to the slug for all Oploverz items to resolve properly
+    // Deduplicate logic
+    const merged = [];
     const normalizedOploverz = oploverzData.map(item => ({
       ...item,
       slug: `oploverz-${item.slug}`
     }));
 
-    // Merge and return
-    const combined = [...otakuData, ...normalizedOploverz];
-    return Response.json(combined);
+    // Helper function to normalize titles for matching
+    const cleanTitle = (t) => t.toLowerCase()
+      .replace(/subtitle indonesia|sub indo|season|s\d+/gi, '')
+      .replace(/[^a-z0-9]/g, '')
+      .trim();
+
+    const matchedOploverzSlugs = new Set();
+
+    otakuData.forEach(otakuItem => {
+      const otakuNorm = cleanTitle(otakuItem.title);
+      
+      // Find matching oploverz item
+      const match = normalizedOploverz.find(opItem => {
+        if (matchedOploverzSlugs.has(opItem.slug)) return false;
+        const opNorm = cleanTitle(opItem.title);
+        return otakuNorm.includes(opNorm) || opNorm.includes(otakuNorm);
+      });
+
+      if (match) {
+        matchedOploverzSlugs.add(match.slug);
+        merged.push({
+          ...otakuItem,
+          // Attach mirrorSlug for frontend/detail router to fetch secondary source details
+          mirrorSlug: match.slug
+        });
+      } else {
+        merged.push(otakuItem);
+      }
+    });
+
+    // Append remaining Oploverz items that were not merged
+    normalizedOploverz.forEach(opItem => {
+      if (!matchedOploverzSlugs.has(opItem.slug)) {
+        merged.push(opItem);
+      }
+    });
+
+    return Response.json(merged);
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

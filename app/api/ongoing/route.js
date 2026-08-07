@@ -35,18 +35,57 @@ export async function GET() {
       source: 'Oploverz'
     }));
 
-    // Interleave merge to show updates from both sources evenly
-    const combined = [];
-    const maxLength = Math.max(otakuData.length, normalizedOploverz.length);
-    for (let i = 0; i < maxLength; i++) {
-      if (i < otakuData.length) combined.push(otakuData[i]);
-      if (i < normalizedOploverz.length) combined.push(normalizedOploverz[i]);
-    }
+    // Deduplicate logic
+    const merged = [];
+    const matchedOploverzSlugs = new Set();
+
+    // Helper to normalize titles and get core keywords (first 2 words)
+    const getCoreKeywords = (title) => {
+      // 1. Remove season strings, brackets content, sub indo strings, and non-alphanumeric chars
+      const clean = title.toLowerCase()
+        .replace(/\([^)]*\)/g, '') // remove parentheses content: (Dogulwang), etc.
+        .replace(/subtitle indonesia|sub indo|season|\bs\d+/gi, '')
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      const words = clean.split(' ').filter(w => w.length > 1);
+      // Return first 2 words as core match criteria
+      return words.slice(0, 2).join(' ');
+    };
+
+    otakuData.forEach(otakuItem => {
+      const otakuCore = getCoreKeywords(otakuItem.title);
+      
+      const match = normalizedOploverz.find(opItem => {
+        if (matchedOploverzSlugs.has(opItem.slug)) return false;
+        const opCore = getCoreKeywords(opItem.title);
+        // Match if core keywords overlap (e.g. 'tomb raider' === 'tomb raider' or 'clevatess' === 'clevatess')
+        return otakuCore.length > 0 && opCore.length > 0 && (otakuCore.includes(opCore) || opCore.includes(otakuCore));
+      });
+
+      if (match) {
+        matchedOploverzSlugs.add(match.slug);
+        merged.push({
+          ...otakuItem,
+          mirrorSlug: match.slug // Save the Oploverz episode/series slug for mirror switching
+        });
+      } else {
+        merged.push(otakuItem);
+      }
+    });
+
+    // Add remaining Oploverz items
+    normalizedOploverz.forEach(opItem => {
+      if (!matchedOploverzSlugs.has(opItem.slug)) {
+        merged.push(opItem);
+      }
+    });
     
     // Save to disk cache
-    setFileCache(CACHE_KEY, combined);
+    setFileCache(CACHE_KEY, merged);
 
-    return Response.json(combined);
+    return Response.json(merged);
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

@@ -9,7 +9,12 @@ export async function GET(request) {
   }
 
   // Only allow proxying images from allowed domains for security
-  const allowed = ['otakudesu.blog', 'otakudesu.cloud', 'otakudesu.ltd', 'i3.wp.com', 'i2.wp.com', 'i1.wp.com', 'i0.wp.com', 'cdn.otakudesu', 'kusonime.com', 'wp-content'];
+  const allowed = [
+    'otakudesu.blog', 'otakudesu.cloud', 'otakudesu.ltd', 
+    'i3.wp.com', 'i2.wp.com', 'i1.wp.com', 'i0.wp.com', 
+    'cdn.otakudesu', 'kusonime.com', 'wp-content',
+    'oploverz.ac', 'oploverz.site', 'backapi.oploverz'
+  ];
   const isAllowed = allowed.some(domain => imageUrl.includes(domain));
   if (!isAllowed) {
     return new Response('Forbidden', { status: 403 });
@@ -19,6 +24,8 @@ export async function GET(request) {
   let referer = `${BASE_URL}/`;
   if (imageUrl.includes('kusonime.com')) {
     referer = 'https://kusonime.com/';
+  } else if (imageUrl.includes('oploverz.ac') || imageUrl.includes('oploverz.site')) {
+    referer = 'https://oploverz.site/';
   }
 
   try {

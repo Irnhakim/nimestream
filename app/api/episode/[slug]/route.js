@@ -32,6 +32,23 @@ export async function GET(request, { params }) {
     const html = await fetchHtml(`https://otakudesu.blog/episode/${slug}/`);
     const data = parseEpisodeDetails(html);
 
+    // Label Otakudesu mirrors
+    if (data.mirrors) {
+      data.mirrors = data.mirrors.map(m => ({
+        ...m,
+        server: m.server,
+        source: 'Otakudesu'
+      }));
+    }
+
+    // Label Otakudesu downloads
+    if (data.downloads) {
+      data.downloads = data.downloads.map(dl => ({
+        ...dl,
+        source: 'Otakudesu'
+      }));
+    }
+
     // If animeSlug is parsed, fetch parent anime detail page to get high-quality portrait cover
     if (data.animeSlug) {
       try {
@@ -42,8 +59,37 @@ export async function GET(request, { params }) {
         if (coverMatch && coverMatch[1]) {
           data.thumb = coverMatch[1];
         }
+
+        // Try to fetch Oploverz mirror dynamically for this episode!
+        // 1. Guess Oploverz series slug from parent animeSlug (or normalization)
+        const cleanParentSlug = data.animeSlug.replace('-sub-indo', '').replace('-subtitle-indonesia', '');
+        
+        // 2. Extract episode number from slug (e.g. anime-name-episode-12-sub-indo -> 12)
+        const epNumberMatch = slug.match(/-episode-(\d+)/i);
+        const epNumber = epNumberMatch ? epNumberMatch[1] : null;
+
+        if (epNumber) {
+          const oploData = await getOploverzEpisode(cleanParentSlug, epNumber);
+          if (oploData) {
+            // Merge mirrors
+            const oploMirrors = oploData.mirrors.map(m => ({
+              ...m,
+              server: m.server,
+              source: 'Oploverz'
+            }));
+            data.mirrors = [...(data.mirrors || []), ...oploMirrors];
+
+            // Merge downloads
+            const oploDownloads = oploData.downloads.map(dl => ({
+              ...dl,
+              quality: dl.quality,
+              source: 'Oploverz'
+            }));
+            data.downloads = [...(data.downloads || []), ...oploDownloads];
+          }
+        }
       } catch (err) {
-        console.error('Failed to parse parent anime cover:', err);
+        console.error('Failed to parse parent anime cover or fetch Oploverz mirrors:', err);
       }
     }
 
