@@ -42,3 +42,6 @@ next-env.d.ts
 
 #tmp
 /tmp/*
+
+# scratch testing scripts
+/scratch/*
