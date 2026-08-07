@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { LOCAL_API_URL } from '@/lib/scraper';
 import EpisodeBox from '@/app/components/EpisodeBox';
 import KusonimeBatchLink from '@/app/components/KusonimeBatchLink';
+import AnimeGrid from '@/app/components/AnimeGrid';
 
 async function getAnimeDetails(slug) {
   try {
@@ -76,7 +77,7 @@ export default async function AnimeDetailsPage({ params }) {
           {/* Automatic Kusonime Batch Finder Link */}
           <KusonimeBatchLink animeTitle={anime.title} />
 
-          <div>
+          <div style={{ marginBottom: '2.5rem' }}>
             <h2 className="section-title">Daftar Episode</h2>
             {anime.episodes.length === 0 ? (
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Belum ada episode yang dirilis.</p>
@@ -84,6 +85,13 @@ export default async function AnimeDetailsPage({ params }) {
               <EpisodeBox episodes={anime.episodes} animeTitle={anime.title} />
             )}
           </div>
+
+          {/* Smart Recommendations Section */}
+          {anime.recommendations && anime.recommendations.length > 0 && (
+            <div style={{ marginTop: '1.5rem' }}>
+              <AnimeGrid title="Rekomendasi Anime Serupa" items={anime.recommendations} />
+            </div>
+          )}
         </div>
       </div>
     </main>
