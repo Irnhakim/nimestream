@@ -72,6 +72,15 @@ export async function GET() {
     const todayName = getTodayName();
     const todayDateStr = getTodayDateString();
 
+    // Helper to clean episode modifiers from slug
+    const cleanSeriesSlug = (slugStr) => {
+      return slugStr
+        .replace(/-episode-\d+.*$/i, '')
+        .replace(/-ep-\d+.*$/i, '')
+        .replace(/-sub-indo.*$/i, '')
+        .replace(/-subtitle-indonesia.*$/i, '');
+    };
+
     // Map dynamic sources data
     const dynamicDataList = [];
     activeSources.forEach((key, idx) => {
@@ -81,7 +90,7 @@ export async function GET() {
       const displayName = key.charAt(0).toUpperCase() + key.slice(1);
       const normalized = data.map(item => ({
         ...item,
-        slug: `${key}-${item.slug}`,
+        slug: `${key}-${cleanSeriesSlug(item.slug)}`,
         source: displayName,
         dayOrRating: todayName,
         date: item.date && item.date !== 'Update' ? item.date : todayDateStr
@@ -92,7 +101,7 @@ export async function GET() {
     // Add source tag and normalize slugs for Oploverz items
     const normalizedOploverz = oploverzData.map(item => ({
       ...item,
-      slug: `oploverz-${item.slug}`,
+      slug: `oploverz-${cleanSeriesSlug(item.slug)}`,
       source: 'Oploverz',
       dayOrRating: todayName,
       date: item.date && item.date !== 'Ongoing' ? item.date : todayDateStr
@@ -101,7 +110,7 @@ export async function GET() {
     // Add source tag and normalize slugs for Alqanime items
     const normalizedAlqanime = alqaData.map(item => ({
       ...item,
-      slug: `alqanime-${item.slug}`,
+      slug: `alqanime-${cleanSeriesSlug(item.slug)}`,
       source: 'Alqanime',
       dayOrRating: todayName,
       date: item.date && item.date !== 'Update' ? item.date : todayDateStr
