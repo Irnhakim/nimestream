@@ -156,15 +156,32 @@ export async function GET() {
       return base;
     };
 
+    // Strict similarity check using word token intersection (at least 60% words must match for short titles)
+    const isTitleSimilar = (titleA, titleB) => {
+      const coreA = getCoreKeywords(titleA);
+      const coreB = getCoreKeywords(titleB);
+      if (!coreA || !coreB) return false;
+
+      // Exact match for short keyword queries
+      if (coreA.length < 5 || coreB.length < 5) {
+        return coreA === coreB;
+      }
+
+      // Word intersection
+      const wordsA = coreA.split(' ');
+      const wordsB = coreB.split(' ');
+      const intersection = wordsA.filter(w => wordsB.includes(w));
+      const ratio = intersection.length / Math.min(wordsA.length, wordsB.length);
+      return ratio >= 0.6; // 60% overlap threshold
+    };
+
     uniqueOtakuData.forEach(otakuItem => {
-      const otakuCore = getCoreKeywords(otakuItem.title);
       const updatedItem = { ...otakuItem };
 
       // Try matching Oploverz
       const opMatch = normalizedOploverz.find(opItem => {
         if (matchedOploverzSlugs.has(opItem.slug)) return false;
-        const opCore = getCoreKeywords(opItem.title);
-        return otakuCore.length > 0 && opCore.length > 0 && (otakuCore.includes(opCore) || opCore.includes(otakuCore));
+        return isTitleSimilar(otakuItem.title, opItem.title);
       });
 
       if (opMatch) {
@@ -175,8 +192,7 @@ export async function GET() {
       // Try matching Alqanime
       const alqaMatch = normalizedAlqanime.find(alqaItem => {
         if (matchedAlqanimeSlugs.has(alqaItem.slug)) return false;
-        const alqaCore = getCoreKeywords(alqaItem.title);
-        return otakuCore.length > 0 && alqaCore.length > 0 && (otakuCore.includes(alqaCore) || alqaCore.includes(otakuCore));
+        return isTitleSimilar(otakuItem.title, alqaItem.title);
       });
 
       if (alqaMatch) {
@@ -188,8 +204,7 @@ export async function GET() {
       dynamicDataList.forEach(dyn => {
         const match = dyn.data.find(dynItem => {
           if (matchedDynamicSlugs[dyn.key].has(dynItem.slug)) return false;
-          const dynCore = getCoreKeywords(dynItem.title);
-          return otakuCore.length > 0 && dynCore.length > 0 && (otakuCore.includes(dynCore) || dynCore.includes(otakuCore));
+          return isTitleSimilar(otakuItem.title, dynItem.title);
         });
 
         if (match) {
@@ -220,32 +235,12 @@ export async function GET() {
       return !isCompleted;
     };
 
-    // Add remaining Oploverz items
-    normalizedOploverz.forEach(opItem => {
-      if (!matchedOploverzSlugs.has(opItem.slug) && isStrictlyOngoing(opItem)) {
-        merged.push(opItem);
-      }
-    });
-
-    // Add remaining Alqanime items
-    normalizedAlqanime.forEach(alqaItem => {
-      if (!matchedAlqanimeSlugs.has(alqaItem.slug) && isStrictlyOngoing(alqaItem)) {
-        merged.push(alqaItem);
-      }
-    });
-
-    // Add remaining dynamic sources items
-    dynamicDataList.forEach(dyn => {
-      dyn.data.forEach(dynItem => {
-        if (!matchedDynamicSlugs[dyn.key].has(dynItem.slug) && isStrictlyOngoing(dynItem)) {
-          merged.push(dynItem);
-        }
-      });
-    });
+    // Only output Otakudesu items. Leftovers from other sources are ignored on the home page ongoing list,
+    // but they remain merged in detail pages through mirrorSlug properties.
 
     // Helper to parse date strings "07 Agu" to comparison timestamp values
     const parseToTimestamp = (dateStr) => {
-      if (!dateStr || dateStr === 'Update') return 0;
+      if (!dateStr || dateStr === 'Update' || dateStr === 'Ongoing') return 0;
       
       const currentYear = new Date().getFullYear();
       const monthMap = {

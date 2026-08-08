@@ -7,7 +7,25 @@ export default function EpisodeBox({ episodes, animeTitle = '' }) {
   const [search, setSearch] = useState('');
   const [order, setOrder] = useState('desc'); // desc = terbaru dulu
 
-  const sorted = order === 'desc' ? [...episodes].reverse() : [...episodes];
+  const getEpisodeNumber = (title) => {
+    if (!title) return 0;
+    // Look specifically for numbers following episode/ep E.g. "Episode 6", "Ep. 06"
+    const match = title.match(/(?:episode|ep)\s*\.?\s*(\d+(?:\.\d+)?)/i);
+    if (match) return parseFloat(match[1]);
+    
+    // Fallback: get the last number block in the string (since episode number is usually at the end)
+    const allNums = title.match(/(\d+(?:\.\d+)?)/g);
+    if (allNums && allNums.length > 0) {
+      return parseFloat(allNums[allNums.length - 1]);
+    }
+    return 0;
+  };
+
+  const sorted = [...episodes].sort((a, b) => {
+    const numA = getEpisodeNumber(a.title);
+    const numB = getEpisodeNumber(b.title);
+    return order === 'desc' ? numB - numA : numA - numB;
+  });
   const filtered = search.trim()
     ? sorted.filter(ep => ep.title.toLowerCase().includes(search.toLowerCase()))
     : sorted;
