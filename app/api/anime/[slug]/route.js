@@ -25,6 +25,7 @@ export async function GET(request, { params }) {
         if (!data) {
           return Response.json({ error: `Anime not found on ${key}` }, { status: 404 });
         }
+        data.slug = slug;
         return Response.json(data);
       } catch (e) {
         return Response.json({ error: e.message }, { status: 500 });
@@ -40,6 +41,7 @@ export async function GET(request, { params }) {
       if (!data) {
         return Response.json({ error: 'Anime not found on Oploverz' }, { status: 404 });
       }
+      data.slug = slug;
       return Response.json(data);
     } catch (e) {
       return Response.json({ error: e.message }, { status: 500 });
@@ -54,6 +56,7 @@ export async function GET(request, { params }) {
       if (!data) {
         return Response.json({ error: 'Anime not found on Alqanime' }, { status: 404 });
       }
+      data.slug = slug;
       return Response.json(data);
     } catch (e) {
       return Response.json({ error: e.message }, { status: 500 });
@@ -63,6 +66,7 @@ export async function GET(request, { params }) {
   try {
     const html = await fetchHtml(`https://otakudesu.blog/anime/${slug}/`);
     const data = parseAnimeDetails(html, slug);
+    data.slug = slug;
 
     // Smart Recommendation System (Genre matching)
     let recommendations = [];

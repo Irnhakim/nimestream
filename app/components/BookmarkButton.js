@@ -5,28 +5,43 @@ import { useState, useEffect } from 'react';
 export default function BookmarkButton({ anime }) {
   const [isBookmarked, setIsBookmarked] = useState(false);
 
+  const getSlug = () => {
+    if (anime.slug) return anime.slug;
+    if (typeof window !== 'undefined') {
+      const parts = window.location.pathname.split('/anime/');
+      if (parts.length > 1) {
+        return parts[1];
+      }
+    }
+    return '';
+  };
+
+  const activeSlug = getSlug();
+
   useEffect(() => {
+    if (!activeSlug) return;
     const watchlist = JSON.parse(localStorage.getItem('ns_watchlist') || '[]');
-    const exists = watchlist.some(item => item.slug === anime.slug);
+    const exists = watchlist.some(item => item.slug === activeSlug);
     setIsBookmarked(exists);
-  }, [anime.slug]);
+  }, [activeSlug]);
 
   const toggleBookmark = () => {
+    if (!activeSlug) return;
     const watchlist = JSON.parse(localStorage.getItem('ns_watchlist') || '[]');
     let updated;
 
     if (isBookmarked) {
       // Remove from watchlist
-      updated = watchlist.filter(item => item.slug !== anime.slug);
+      updated = watchlist.filter(item => item.slug !== activeSlug);
       setIsBookmarked(false);
     } else {
       // Add to watchlist
       const newItem = {
         title: anime.title,
-        slug: anime.slug,
+        slug: activeSlug,
         thumb: anime.thumb,
-        rating: anime.info.rating || anime.info.score || '?',
-        status: anime.info.status || '?',
+        rating: anime.info?.rating || anime.info?.score || anime.rating || '?',
+        status: anime.info?.status || anime.status || '?',
         addedAt: Date.now()
       };
       updated = [newItem, ...watchlist];
