@@ -40,6 +40,10 @@ export async function GET(request) {
   }
 
   try {
+    // Add abort controller to prevent long timeout waits
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 seconds timeout limit
+
     const response = await fetch(imageUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -47,11 +51,15 @@ export async function GET(request) {
         'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
         'Accept-Encoding': 'gzip, deflate, br',
       },
+      signal: controller.signal,
       cache: 'no-store',
     });
 
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
-      return new Response('Image not found', { status: 404 });
+      // Fallback redirect to direct URL if fetch failed but URL is reachable in browser
+      return Response.redirect(imageUrl, 302);
     }
 
     const contentType = response.headers.get('content-type') || 'image/jpeg';
@@ -66,7 +74,7 @@ export async function GET(request) {
       },
     });
   } catch (err) {
-    console.error('Image proxy error:', err);
-    return new Response('Proxy error', { status: 500 });
+    console.error('Image proxy error, falling back to direct redirect:', err.message);
+    return Response.redirect(imageUrl, 302);
   }
 }
