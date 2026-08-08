@@ -79,143 +79,92 @@ export async function GET(request) {
       source: 'Alqanime'
     }));
 
-    // Helper function to normalize titles for matching
-    const cleanTitle = (t) => t.toLowerCase()
-      .replace(/subtitle indonesia|sub indo|season|s\d+/gi, '')
-      .replace(/[^a-z0-9]/g, '')
-      .trim();
+    // Helper to get season number
+    const getSeason = (titleStr) => {
+      const t = titleStr.toLowerCase();
+      const ordMatch = t.match(/(\d+)(?:st|nd|rd|th)\s+season/);
+      if (ordMatch) return parseInt(ordMatch[1], 10);
+      const seasonMatch = t.match(/season\s+(\d+)/);
+      if (seasonMatch) return parseInt(seasonMatch[1], 10);
+      const sMatch = t.match(/\bs(\d+)\b/);
+      if (sMatch) return parseInt(sMatch[1], 10);
+      return 1; // Default to season 1
+    };
 
-    const matchedOploverzSlugs = new Set();
-    const matchedAlqanimeSlugs = new Set();
-    const matchedDynamicSlugs = {};
-    activeSources.forEach(key => {
-      matchedDynamicSlugs[key] = new Set();
-    });
+    // Helper function to normalize titles for matching (gets primary title segment)
+    const cleanTitle = (t) => {
+      let mainPart = t.split(/[:(]/)[0];
+      return mainPart.toLowerCase()
+        .replace(/subtitle indonesia|sub indo/gi, '')
+        .replace(/season\s*\d+|s\d+/gi, '')
+        .replace(/[^a-z0-9]/g, '')
+        .trim();
+    };
 
-    otakuData.forEach(otakuItem => {
-      const otakuNorm = cleanTitle(otakuItem.title);
-      const updatedItem = { ...otakuItem };
-      
-      // Find matching oploverz item
-      const opMatch = normalizedOploverz.find(opItem => {
-        if (matchedOploverzSlugs.has(opItem.slug)) return false;
-        const opNorm = cleanTitle(opItem.title);
-        return otakuNorm.includes(opNorm) || opNorm.includes(otakuNorm);
-      });
+    // Strict overlap & season match checker
+    const isSearchMatch = (t1, t2) => {
+      if (getSeason(t1) !== getSeason(t2)) return false;
+      const n1 = cleanTitle(t1);
+      const n2 = cleanTitle(t2);
+      return n1.includes(n2) || n2.includes(n1);
+    };
 
-      if (opMatch) {
-        matchedOploverzSlugs.add(opMatch.slug);
-        updatedItem.mirrorSlug = opMatch.slug;
-      }
-
-      // Find matching alqanime item
-      const alqaMatch = normalizedAlqanime.find(alqaItem => {
-        if (matchedAlqanimeSlugs.has(alqaItem.slug)) return false;
-        const alqaNorm = cleanTitle(alqaItem.title);
-        return otakuNorm.includes(alqaNorm) || alqaNorm.includes(otakuNorm);
-      });
-
-      if (alqaMatch) {
-        matchedAlqanimeSlugs.add(alqaMatch.slug);
-        updatedItem.mirrorSlugAlqanime = alqaMatch.slug;
-      }
-
-      // Find matching dynamic search results
-      dynamicSearchList.forEach(dyn => {
-        const match = dyn.data.find(dynItem => {
-          if (matchedDynamicSlugs[dyn.key].has(dynItem.slug)) return false;
-          const dynNorm = cleanTitle(dynItem.title);
-          return otakuNorm.includes(dynNorm) || dynNorm.includes(otakuNorm);
-        });
-
-        if (match) {
-          matchedDynamicSlugs[dyn.key].add(match.slug);
-          const attrName = `mirrorSlug${dyn.displayName}`;
-          updatedItem[attrName] = match.slug;
-        }
-      });
-
-      merged.push(updatedItem);
-    });
-
-    // Gather all leftover items from all non-Otakudesu sources
-    const leftovers = [];
-    
-    normalizedOploverz.forEach(opItem => {
-      if (!matchedOploverzSlugs.has(opItem.slug)) {
-        leftovers.push(opItem);
-      }
-    });
-
-    normalizedAlqanime.forEach(alqaItem => {
-      if (!matchedAlqanimeSlugs.has(alqaItem.slug)) {
-        leftovers.push(alqaItem);
-      }
-    });
-
+    const allItems = [
+      ...otakuData.map(item => ({ ...item, source: 'Otakudesu', originSlug: item.slug })),
+      ...normalizedOploverz.map(item => ({ ...item, source: 'Oploverz', originSlug: item.slug })),
+      ...normalizedAlqanime.map(item => ({ ...item, source: 'Alqanime', originSlug: item.slug })),
+    ];
     dynamicSearchList.forEach(dyn => {
-      dyn.data.forEach(dynItem => {
-        if (!matchedDynamicSlugs[dyn.key].has(dynItem.slug)) {
-          leftovers.push(dynItem);
-        }
-      });
+      allItems.push(...dyn.data.map(item => ({ ...item, source: dyn.displayName, originSlug: item.slug })));
     });
 
-    // Deduplicate leftovers among themselves
-    const uniqueLeftovers = [];
-    const matchedLeftoverSlugs = new Set();
+    const finalMerged = [];
 
-    leftovers.forEach(item => {
-      if (matchedLeftoverSlugs.has(item.slug)) return;
+    allItems.forEach(item => {
+      // Find matching item in finalMerged based on title and season
+      const existing = finalMerged.find(fItem => isSearchMatch(fItem.title, item.title));
 
-      const norm = cleanTitle(item.title);
-      const updatedItem = { ...item };
-      matchedLeftoverSlugs.add(item.slug);
-
-      // Find other leftovers with similar titles
-      leftovers.forEach(other => {
-        if (item.slug === other.slug || matchedLeftoverSlugs.has(other.slug)) return;
-
-        const otherNorm = cleanTitle(other.title);
-        // Fuzzy title comparison: first 2 words matching
-        const words1 = norm.split(' ').slice(0, 2).join(' ');
-        const words2 = otherNorm.split(' ').slice(0, 2).join(' ');
-
-        // Visual cover check: extract image filename (E.g. Release-that-Witch.jpg)
-        const getCoverFilename = (url) => {
-          if (!url) return '';
-          return decodeURIComponent(url).split('/').pop().split('?')[0].toLowerCase().replace(/-\d+x\d+/g, ''); // strip wordpress sizes
+      if (existing) {
+        // Map slug to the appropriate mirror key
+        if (item.source === 'Oploverz') {
+          existing.mirrorSlug = item.originSlug;
+        } else if (item.source === 'Alqanime') {
+          existing.mirrorSlugAlqanime = item.originSlug;
+        } else if (item.source !== 'Otakudesu') {
+          existing[`mirrorSlug${item.source}`] = item.originSlug;
+        }
+        
+        // Use better thumbnail if current is missing/placeholder
+        if ((!existing.thumb || existing.thumb.includes('placeholder')) && item.thumb && !item.thumb.includes('placeholder')) {
+          existing.thumb = item.thumb;
+        }
+        // Update status if current is unknown/empty
+        if ((!existing.status || existing.status === '?' || existing.status === 'Unknown') && item.status && item.status !== 'Unknown') {
+          existing.status = item.status;
+        }
+      } else {
+        // Create new merged item
+        const newItem = {
+          title: item.title,
+          slug: item.originSlug,
+          thumb: item.thumb,
+          status: item.status,
+          source: item.source
         };
 
-        const cover1 = getCoverFilename(item.thumb);
-        const cover2 = getCoverFilename(other.thumb);
-
-        const isTitleMatch = words1.length > 2 && words2.length > 2 && (words1.includes(words2) || words2.includes(words1));
-        const isCoverMatch = cover1.length > 5 && cover2.length > 5 && (cover1.includes(cover2) || cover2.includes(cover1));
-
-        if (isTitleMatch || isCoverMatch) {
-          matchedLeftoverSlugs.add(other.slug);
-          
-          // Map mirror key based on source name
-          if (other.source === 'Oploverz') {
-            updatedItem.mirrorSlug = other.slug;
-          } else if (other.source === 'Alqanime') {
-            updatedItem.mirrorSlugAlqanime = other.slug;
-          } else {
-            // Dynamic sources (E.g. Samehadaku -> mirrorSlugSamehadaku)
-            const attrName = `mirrorSlug${other.source}`;
-            updatedItem[attrName] = other.slug;
-          }
+        if (item.source === 'Oploverz') {
+          newItem.mirrorSlug = item.originSlug;
+        } else if (item.source === 'Alqanime') {
+          newItem.mirrorSlugAlqanime = item.originSlug;
+        } else if (item.source !== 'Otakudesu') {
+          newItem[`mirrorSlug${item.source}`] = item.originSlug;
         }
-      });
 
-      uniqueLeftovers.push(updatedItem);
+        finalMerged.push(newItem);
+      }
     });
 
-    // Append the unified unique leftovers
-    merged.push(...uniqueLeftovers);
-
-    return Response.json(merged);
+    return Response.json(finalMerged);
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

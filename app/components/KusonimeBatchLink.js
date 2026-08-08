@@ -14,7 +14,21 @@ export default function KusonimeBatchLink({ animeTitle }) {
   useEffect(() => {
     if (!animeTitle || process.env.NEXT_PUBLIC_KUSONIME_ENABLED !== 'true') return;
 
-    // Clean anime title to maximize search matching
+    // Extract season helper
+    const extractSeason = (titleStr) => {
+      const t = titleStr.toLowerCase();
+      const ordMatch = t.match(/(\d+)(?:st|nd|rd|th)\s+season/);
+      if (ordMatch) return parseInt(ordMatch[1], 10);
+      const seasonMatch = t.match(/season\s+(\d+)/);
+      if (seasonMatch) return parseInt(seasonMatch[1], 10);
+      const sMatch = t.match(/\bs(\d+)\b/);
+      if (sMatch) return parseInt(sMatch[1], 10);
+      return 1; // Default to season 1
+    };
+
+    const targetSeason = extractSeason(animeTitle);
+
+    // Clean anime title to maximize search matching (but keep season info for query)
     const cleanTitle = animeTitle
       .replace(/subtitle indonesia/gi, '')
       .replace(/sub indo/gi, '')
@@ -25,18 +39,22 @@ export default function KusonimeBatchLink({ animeTitle }) {
     if (!cleanTitle) return;
 
     setLoading(true);
+    // Search with the clean title
     fetch(`/api/kusonime/search?q=${encodeURIComponent(cleanTitle)}`)
       .then(res => (res.ok ? res.json() : []))
       .then(data => {
         if (data && data.length > 0) {
-          // Verify strict title similarity
+          // Verify strict title similarity and season match
           const targetNorm = cleanTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
           const match = data.find(item => {
             const itemNorm = (item.title || '').toLowerCase()
               .replace(/subtitle indonesia|sub indo|season \d+|s\d+/gi, '')
               .replace(/[^a-z0-9]/g, '');
-            // Both must share a strong title overlap
-            return itemNorm.includes(targetNorm) || targetNorm.includes(itemNorm);
+            
+            // Check if title is similar AND season matches exactly
+            const isTitleMatch = itemNorm.includes(targetNorm) || targetNorm.includes(itemNorm);
+            const itemSeason = extractSeason(item.title || '');
+            return isTitleMatch && targetSeason === itemSeason;
           });
           
           if (match) {

@@ -3,19 +3,27 @@ import { getOploverzEpisode } from '@/lib/oploverzScraper';
 import { getAlqanimeEpisode } from '@/lib/alqanimeScraper';
 import { getEpisodeFromSource } from '@/lib/multiScraper';
 
+const sourceKeys = [
+  'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 
+  'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime', 
+  'animekompi', 'donghub', 'dramabox'
+];
+
 export async function GET(request, { params }) {
   const { slug } = await params;
   if (!slug) {
     return Response.json({ error: 'Missing slug' }, { status: 400 });
   }
 
-  // Dynamic sourceKeys routing check for multiScraper episode players
-  const sourceKeys = [
-    'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 
-    'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime', 
-    'animekompi', 'donghub', 'dramabox'
-  ];
+  const { searchParams } = new URL(request.url);
+  const oploverzSlug = searchParams.get('oploverz');
+  const alqanimeSlug = searchParams.get('alqanime');
+  const dynSlugs = {};
+  sourceKeys.forEach(k => {
+    dynSlugs[k] = searchParams.get(k);
+  });
 
+  // Dynamic sourceKeys routing check for multiScraper episode players
   for (const key of sourceKeys) {
     if (slug.startsWith(`${key}-`)) {
       try {
@@ -103,17 +111,22 @@ export async function GET(request, { params }) {
           const { getSourceConfig } = require('@/lib/multiScraper');
           const activeSources = sourceKeys.filter(k => getSourceConfig(k).enabled);
 
+          // Use parameters passed from anime detail page or fallback to predicted slug
+          const targetOploSlug = oploverzSlug ? oploverzSlug.replace('oploverz-', '') : cleanParentSlug;
+          const targetAlqaSlug = alqanimeSlug ? alqanimeSlug.replace('alqanime-', '') : cleanParentSlug;
+
           // Fetch Oploverz, Alqanime, & dynamic sources mirrors concurrently
           const promises = [
-            getOploverzEpisode(cleanParentSlug, epNumber).catch(() => null),
-            getAlqanimeEpisode(`${cleanParentSlug}-episode-${epNumber}`).catch(() => null),
+            getOploverzEpisode(targetOploSlug, epNumber).catch(() => null),
+            getAlqanimeEpisode(`${targetAlqaSlug}-episode-${epNumber}`).catch(() => null),
             ...activeSources.map(async (key) => {
+              const dynSlug = dynSlugs[key] ? dynSlugs[key].replace(`${key}-`, '') : cleanParentSlug;
               // Try standard themesia slug patterns
               try {
-                return await getEpisodeFromSource(key, `${cleanParentSlug}-episode-${epNumber}`);
+                return await getEpisodeFromSource(key, `${dynSlug}-episode-${epNumber}`);
               } catch {
                 try {
-                  return await getEpisodeFromSource(key, `${cleanParentSlug}-ep-${epNumber}`);
+                  return await getEpisodeFromSource(key, `${dynSlug}-ep-${epNumber}`);
                 } catch {
                   return null;
                 }

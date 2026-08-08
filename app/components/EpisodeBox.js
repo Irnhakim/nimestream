@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-export default function EpisodeBox({ episodes, animeTitle = '' }) {
+export default function EpisodeBox({ episodes, animeTitle = '', anime = null }) {
   const [search, setSearch] = useState('');
   const [order, setOrder] = useState('desc'); // desc = terbaru dulu
 
@@ -58,6 +58,31 @@ export default function EpisodeBox({ episodes, animeTitle = '' }) {
     return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
   };
 
+  // Build query params for mirror sources
+  const getEpisodeQueryString = () => {
+    if (!anime) return '';
+    const queryParams = [];
+    if (anime.mirrorSlug) queryParams.push(`oploverz=${encodeURIComponent(anime.mirrorSlug)}`);
+    if (anime.mirrorSlugAlqanime) queryParams.push(`alqanime=${encodeURIComponent(anime.mirrorSlugAlqanime)}`);
+    
+    const sourceKeys = [
+      'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 
+      'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime', 
+      'animekompi', 'donghub', 'dramabox'
+    ];
+    sourceKeys.forEach(key => {
+      const displayName = key.charAt(0).toUpperCase() + key.slice(1);
+      const attr = `mirrorSlug${displayName}`;
+      if (anime[attr]) {
+        queryParams.push(`${key}=${encodeURIComponent(anime[attr])}`);
+      }
+    });
+
+    return queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+  };
+
+  const queryString = getEpisodeQueryString();
+
   return (
     <div className="episode-box">
       {/* Navbar */}
@@ -107,7 +132,7 @@ export default function EpisodeBox({ episodes, animeTitle = '' }) {
           </p>
         ) : (
           filtered.map((ep, idx) => (
-            <Link key={idx} href={`/episode/${ep.slug}`} className="episode-item">
+            <Link key={idx} href={`/episode/${ep.slug}${queryString}`} className="episode-item">
               <span className="episode-title">{cleanEpisodeTitle(ep.title)}</span>
               <span className="episode-date">{ep.date}</span>
             </Link>

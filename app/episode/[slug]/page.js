@@ -2,9 +2,10 @@ import EpisodeStreamPlayer from '@/app/components/EpisodeStreamPlayer';
 import { LOCAL_API_URL } from '@/lib/scraper';
 import WatchHistoryTracker from '@/app/components/WatchHistoryTracker';
 
-async function getEpisodeDetails(slug) {
+async function getEpisodeDetails(slug, searchParamsStr = '') {
   try {
-    const res = await fetch(`${LOCAL_API_URL}/api/episode/${slug}`, {
+    const url = `${LOCAL_API_URL}/api/episode/${slug}${searchParamsStr ? `?${searchParamsStr}` : ''}`;
+    const res = await fetch(url, {
       cache: 'no-store'
     });
     if (!res.ok) return null;
@@ -15,10 +16,22 @@ async function getEpisodeDetails(slug) {
   }
 }
 
-export default async function EpisodePage({ params }) {
+export default async function EpisodePage({ params, searchParams }) {
   const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
   const { slug } = resolvedParams;
-  const episode = await getEpisodeDetails(slug);
+
+  // Build query string from searchParams to forward to local API endpoint
+  const queryParams = [];
+  if (resolvedSearchParams) {
+    Object.entries(resolvedSearchParams).forEach(([k, v]) => {
+      if (v) {
+        queryParams.push(`${k}=${encodeURIComponent(v)}`);
+      }
+    });
+  }
+  const searchParamsStr = queryParams.join('&');
+  const episode = await getEpisodeDetails(slug, searchParamsStr);
 
   if (!episode) {
     return (

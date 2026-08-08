@@ -68,6 +68,81 @@ export async function GET(request, { params }) {
     const data = parseAnimeDetails(html, slug);
     data.slug = slug;
 
+    // Search and auto-resolve mirror slugs from other sources in real-time
+    try {
+      const titleQuery = data.title;
+      const { searchOploverz } = require('@/lib/oploverzScraper');
+      const { searchAlqanime } = require('@/lib/alqanimeScraper');
+      const { searchFromSource, getSourceConfig } = require('@/lib/multiScraper');
+      
+      const activeSources = sourceKeys.filter(key => getSourceConfig(key).enabled);
+      
+      const getSeason = (titleStr) => {
+        const t = titleStr.toLowerCase();
+        const ordMatch = t.match(/(\d+)(?:st|nd|rd|th)\s+season/);
+        if (ordMatch) return parseInt(ordMatch[1], 10);
+        const seasonMatch = t.match(/season\s+(\d+)/);
+        if (seasonMatch) return parseInt(seasonMatch[1], 10);
+        const sMatch = t.match(/\bs(\d+)\b/);
+        if (sMatch) return parseInt(sMatch[1], 10);
+        return 1;
+      };
+
+      const cleanTitle = (t) => {
+        let mainPart = t.split(/[:(]/)[0];
+        return mainPart.toLowerCase()
+          .replace(/subtitle indonesia|sub indo/gi, '')
+          .replace(/season\s*\d+|s\d+/gi, '')
+          .replace(/[^a-z0-9]/g, '')
+          .trim();
+      };
+
+      const isMatch = (t1, t2) => {
+        if (getSeason(t1) !== getSeason(t2)) return false;
+        const n1 = cleanTitle(t1);
+        const n2 = cleanTitle(t2);
+        return n1.includes(n2) || n2.includes(n1);
+      };
+
+      const searchPromises = [
+        searchOploverz(titleQuery).catch(() => []),
+        searchAlqanime(titleQuery).catch(() => []),
+        ...activeSources.map(key => searchFromSource(key, titleQuery).catch(() => []))
+      ];
+
+      const searchResults = await Promise.allSettled(searchPromises);
+
+      // Match Oploverz
+      if (searchResults[0].status === 'fulfilled' && searchResults[0].value) {
+        const oploMatch = searchResults[0].value.find(item => isMatch(titleQuery, item.title));
+        if (oploMatch) {
+          data.mirrorSlug = `oploverz-${oploMatch.slug}`;
+        }
+      }
+
+      // Match Alqanime
+      if (searchResults[1].status === 'fulfilled' && searchResults[1].value) {
+        const alqaMatch = searchResults[1].value.find(item => isMatch(titleQuery, item.title));
+        if (alqaMatch) {
+          data.mirrorSlugAlqanime = `alqanime-${alqaMatch.slug}`;
+        }
+      }
+
+      // Match Dynamic Sources
+      activeSources.forEach((key, idx) => {
+        const resIdx = 2 + idx;
+        if (searchResults[resIdx].status === 'fulfilled' && searchResults[resIdx].value) {
+          const dynMatch = searchResults[resIdx].value.find(item => isMatch(titleQuery, item.title));
+          if (dynMatch) {
+            const displayName = key.charAt(0).toUpperCase() + key.slice(1);
+            data[`mirrorSlug${displayName}`] = `${key}-${dynMatch.slug}`;
+          }
+        }
+      });
+    } catch (e) {
+      console.error('Failed to auto-resolve mirror slugs in detail page:', e);
+    }
+
     // Smart Recommendation System (Genre matching)
     let recommendations = [];
     const targetGenres = data.genres || [];

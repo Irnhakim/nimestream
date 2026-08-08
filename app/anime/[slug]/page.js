@@ -84,7 +84,7 @@ export default async function AnimeDetailsPage({ params }) {
             {anime.episodes.length === 0 ? (
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Belum ada episode yang dirilis.</p>
             ) : (
-              <EpisodeBox episodes={anime.episodes} animeTitle={anime.title} />
+              <EpisodeBox episodes={anime.episodes} animeTitle={anime.title} anime={anime} />
             )}
           </div>
 
