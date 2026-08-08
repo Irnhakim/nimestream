@@ -100,15 +100,32 @@ export async function GET(request, { params }) {
         const epNumber = epNumberMatch ? epNumberMatch[1] : null;
 
         if (epNumber) {
-          // Fetch Oploverz & Alqanime mirrors concurrently
-          const [oploResult, alqaResult] = await Promise.allSettled([
-            getOploverzEpisode(cleanParentSlug, epNumber),
-            getAlqanimeEpisode(`${cleanParentSlug}-episode-${epNumber}`)
-          ]);
+          const { getSourceConfig } = require('@/lib/multiScraper');
+          const activeSources = sourceKeys.filter(k => getSourceConfig(k).enabled);
+
+          // Fetch Oploverz, Alqanime, & dynamic sources mirrors concurrently
+          const promises = [
+            getOploverzEpisode(cleanParentSlug, epNumber).catch(() => null),
+            getAlqanimeEpisode(`${cleanParentSlug}-episode-${epNumber}`).catch(() => null),
+            ...activeSources.map(async (key) => {
+              // Try standard themesia slug patterns
+              try {
+                return await getEpisodeFromSource(key, `${cleanParentSlug}-episode-${epNumber}`);
+              } catch {
+                try {
+                  return await getEpisodeFromSource(key, `${cleanParentSlug}-ep-${epNumber}`);
+                } catch {
+                  return null;
+                }
+              }
+            })
+          ];
+
+          const results = await Promise.allSettled(promises);
 
           // Merge Oploverz mirrors
-          if (oploResult.status === 'fulfilled' && oploResult.value) {
-            const oploData = oploResult.value;
+          if (results[0].status === 'fulfilled' && results[0].value) {
+            const oploData = results[0].value;
             const oploMirrors = oploData.mirrors.map(m => ({
               ...m,
               server: m.server,
@@ -125,8 +142,8 @@ export async function GET(request, { params }) {
           }
 
           // Merge Alqanime mirrors
-          if (alqaResult.status === 'fulfilled' && alqaResult.value) {
-            const alqaData = alqaResult.value;
+          if (results[1].status === 'fulfilled' && results[1].value) {
+            const alqaData = results[1].value;
             const alqaMirrors = alqaData.mirrors.map(m => ({
               ...m,
               server: m.server,
@@ -141,6 +158,29 @@ export async function GET(request, { params }) {
             }));
             data.downloads = [...(data.downloads || []), ...alqaDownloads];
           }
+
+          // Merge Dynamic Sources mirrors
+          activeSources.forEach((key, idx) => {
+            const resIndex = 2 + idx;
+            const sourceName = key.charAt(0).toUpperCase() + key.slice(1);
+            if (results[resIndex].status === 'fulfilled' && results[resIndex].value) {
+              const dynData = results[resIndex].value;
+              
+              const dynMirrors = (dynData.mirrors || []).map(m => ({
+                ...m,
+                server: m.server,
+                source: sourceName
+              }));
+              data.mirrors = [...(data.mirrors || []), ...dynMirrors];
+
+              const dynDownloads = (dynData.downloads || []).map(dl => ({
+                ...dl,
+                quality: dl.quality,
+                source: sourceName
+              }));
+              data.downloads = [...(data.downloads || []), ...dynDownloads];
+            }
+          });
         }
       } catch (err) {
         console.error('Failed to parse parent anime cover or fetch dynamic mirrors:', err);

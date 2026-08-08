@@ -29,9 +29,20 @@ export default function KusonimeBatchLink({ animeTitle }) {
       .then(res => (res.ok ? res.json() : []))
       .then(data => {
         if (data && data.length > 0) {
-          const match = data[0];
-          // Fetch full batch details containing the direct download links
-          return fetch(`/api/kusonime/detail/${match.slug}`);
+          // Verify strict title similarity
+          const targetNorm = cleanTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const match = data.find(item => {
+            const itemNorm = (item.title || '').toLowerCase()
+              .replace(/subtitle indonesia|sub indo|season \d+|s\d+/gi, '')
+              .replace(/[^a-z0-9]/g, '');
+            // Both must share a strong title overlap
+            return itemNorm.includes(targetNorm) || targetNorm.includes(itemNorm);
+          });
+          
+          if (match) {
+            // Fetch full batch details containing the direct download links
+            return fetch(`/api/kusonime/detail/${match.slug}`);
+          }
         }
         return null;
       })
