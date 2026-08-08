@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import AnimeGrid from './components/AnimeGrid';
 import { LOCAL_API_URL } from '@/lib/scraper';
 import { getLatestKusonime } from '@/lib/kusonimeScraper';
