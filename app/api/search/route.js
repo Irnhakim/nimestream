@@ -1,5 +1,6 @@
 import { fetchHtml, parseSearchList } from '@/lib/scraper';
 import { searchOploverz } from '@/lib/oploverzScraper';
+import { searchAlqanime } from '@/lib/alqanimeScraper';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -14,10 +15,9 @@ export async function GET(request) {
       ? `https://otakudesu.blog/?p=${q}`
       : `https://otakudesu.blog/?s=${encodeURIComponent(q)}&post_type=anime`;
 
-    // Fetch Otakudesu search and Oploverz search concurrently
-    const [otakuResult, oploverzResult] = await Promise.allSettled([
+    // Fetch Otakudesu search, Oploverz search, and Alqanime search concurrently
+    const [otakuResult, oploverzResult, alqaResult] = await Promise.allSettled([
       fetchHtml(targetUrl).then(html => {
-        // If it was a redirect to details page (which contains .sinopc or similar details structure)
         if (isPostId && (html.includes('sinopc') || html.includes('infozin'))) {
           const slugMatch = html.match(/href=["']https?:\/\/(?:www\.)?otakudesu\.[^"']+\/anime\/([^"'\s>]+)\/?["']/i);
           const canonicalSlug = html.match(/link rel=["']canonical["'] href=["']https?:\/\/(?:www\.)?otakudesu\.[^"']+\/anime\/([^"'\s>]+)\/?["']/i);
@@ -30,17 +30,24 @@ export async function GET(request) {
         }
         return parseSearchList(html);
       }),
-      searchOploverz(q)
+      searchOploverz(q),
+      searchAlqanime(q)
     ]);
 
     const otakuData = otakuResult.status === 'fulfilled' ? otakuResult.value : [];
     const oploverzData = oploverzResult.status === 'fulfilled' ? oploverzResult.value : [];
+    const alqaData = alqaResult.status === 'fulfilled' ? alqaResult.value : [];
 
     // Deduplicate logic
     const merged = [];
     const normalizedOploverz = oploverzData.map(item => ({
       ...item,
       slug: `oploverz-${item.slug}`
+    }));
+
+    const normalizedAlqanime = alqaData.map(item => ({
+      ...item,
+      slug: `alqanime-${item.slug}`
     }));
 
     // Helper function to normalize titles for matching
@@ -50,33 +57,50 @@ export async function GET(request) {
       .trim();
 
     const matchedOploverzSlugs = new Set();
+    const matchedAlqanimeSlugs = new Set();
 
     otakuData.forEach(otakuItem => {
       const otakuNorm = cleanTitle(otakuItem.title);
+      const updatedItem = { ...otakuItem };
       
       // Find matching oploverz item
-      const match = normalizedOploverz.find(opItem => {
+      const opMatch = normalizedOploverz.find(opItem => {
         if (matchedOploverzSlugs.has(opItem.slug)) return false;
         const opNorm = cleanTitle(opItem.title);
         return otakuNorm.includes(opNorm) || opNorm.includes(otakuNorm);
       });
 
-      if (match) {
-        matchedOploverzSlugs.add(match.slug);
-        merged.push({
-          ...otakuItem,
-          // Attach mirrorSlug for frontend/detail router to fetch secondary source details
-          mirrorSlug: match.slug
-        });
-      } else {
-        merged.push(otakuItem);
+      if (opMatch) {
+        matchedOploverzSlugs.add(opMatch.slug);
+        updatedItem.mirrorSlug = opMatch.slug;
       }
+
+      // Find matching alqanime item
+      const alqaMatch = normalizedAlqanime.find(alqaItem => {
+        if (matchedAlqanimeSlugs.has(alqaItem.slug)) return false;
+        const alqaNorm = cleanTitle(alqaItem.title);
+        return otakuNorm.includes(alqaNorm) || alqaNorm.includes(otakuNorm);
+      });
+
+      if (alqaMatch) {
+        matchedAlqanimeSlugs.add(alqaMatch.slug);
+        updatedItem.mirrorSlugAlqanime = alqaMatch.slug;
+      }
+
+      merged.push(updatedItem);
     });
 
     // Append remaining Oploverz items that were not merged
     normalizedOploverz.forEach(opItem => {
       if (!matchedOploverzSlugs.has(opItem.slug)) {
         merged.push(opItem);
+      }
+    });
+
+    // Append remaining Alqanime items that were not merged
+    normalizedAlqanime.forEach(alqaItem => {
+      if (!matchedAlqanimeSlugs.has(alqaItem.slug)) {
+        merged.push(alqaItem);
       }
     });
 

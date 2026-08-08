@@ -58,6 +58,19 @@ NEXT_PUBLIC_KUSONIME_URL=https://kusonime.com
 # Konfigurasi Oploverz (Opsional)
 NEXT_PUBLIC_OPLOVERZ_ENABLED=true
 NEXT_PUBLIC_OPLOVERZ_API_URL=https://backapi.oploverz.ac/api
+
+# Konfigurasi Alqanime (Opsional)
+NEXT_PUBLIC_ALQANIME_ENABLED=false
+NEXT_PUBLIC_ALQANIME_URL=https://alqanime.net
+
+# Konfigurasi 11+ Platform Tambahan (Dapat Diaktifkan Sesuai Kebutuhan)
+NEXT_PUBLIC_SAMEHADAKU_ENABLED=false
+NEXT_PUBLIC_SAMEHADAKU_URL=https://v1.samehadaku.how
+NEXT_PUBLIC_DONGHUA_ENABLED=false
+NEXT_PUBLIC_DONGHUA_URL=https://anichin.cafe
+NEXT_PUBLIC_ANIMASU_ENABLED=false
+NEXT_PUBLIC_ANIMASU_URL=https://v1.animasu.top
+# (Lihat file .env.local untuk daftar lengkap 18 variabel platform lainnya)
 ```
 
 ### 4. Jalankan Server Development

@@ -1,11 +1,35 @@
 import { fetchHtml, parseAnimeDetails } from '@/lib/scraper';
 import { getFileCache } from '@/lib/fileCache';
 import { getOploverzDetails } from '@/lib/oploverzScraper';
+import { getAlqanimeDetails } from '@/lib/alqanimeScraper';
+import { getDetailsFromSource } from '@/lib/multiScraper';
 
 export async function GET(request, { params }) {
   const { slug } = await params;
   if (!slug) {
     return Response.json({ error: 'Missing slug' }, { status: 400 });
+  }
+
+  // List of new dynamic prefix keys from multiScraper
+  const sourceKeys = [
+    'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 
+    'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime', 
+    'animekompi', 'donghub', 'dramabox'
+  ];
+
+  for (const key of sourceKeys) {
+    if (slug.startsWith(`${key}-`)) {
+      try {
+        const realSlug = slug.replace(`${key}-`, '');
+        const data = await getDetailsFromSource(key, realSlug);
+        if (!data) {
+          return Response.json({ error: `Anime not found on ${key}` }, { status: 404 });
+        }
+        return Response.json(data);
+      } catch (e) {
+        return Response.json({ error: e.message }, { status: 500 });
+      }
+    }
   }
 
   // Route routing for Oploverz source
@@ -15,6 +39,20 @@ export async function GET(request, { params }) {
       const data = await getOploverzDetails(realSlug);
       if (!data) {
         return Response.json({ error: 'Anime not found on Oploverz' }, { status: 404 });
+      }
+      return Response.json(data);
+    } catch (e) {
+      return Response.json({ error: e.message }, { status: 500 });
+    }
+  }
+
+  // Route routing for Alqanime source
+  if (slug.startsWith('alqanime-')) {
+    try {
+      const realSlug = slug.replace('alqanime-', '');
+      const data = await getAlqanimeDetails(realSlug);
+      if (!data) {
+        return Response.json({ error: 'Anime not found on Alqanime' }, { status: 404 });
       }
       return Response.json(data);
     } catch (e) {

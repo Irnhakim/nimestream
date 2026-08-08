@@ -1,8 +1,7 @@
 import { fetchHtml, parseHomeList } from '@/lib/scraper';
 import { getFileCache, setFileCache } from '@/lib/fileCache';
-import { getLatestOploverz } from '@/lib/oploverzScraper';
-
-import { OPLOVERZ_ENABLED } from '@/lib/oploverzScraper';
+import { getLatestOploverz, OPLOVERZ_ENABLED } from '@/lib/oploverzScraper';
+import { getLatestAlqanime, ALQANIME_ENABLED } from '@/lib/alqanimeScraper';
 
 const ONE_HOUR_MS = 1 * 60 * 60 * 1000;
 const CACHE_KEY = 'ongoing_list';
@@ -10,23 +9,28 @@ const CACHE_KEY = 'ongoing_list';
 export async function GET() {
   const cachedData = getFileCache(CACHE_KEY, ONE_HOUR_MS);
   if (cachedData) {
-    // If Oploverz is disabled, filter out Oploverz items from cached data to prevent ghost data
+    let filtered = cachedData;
+    // Filter out disabled sources dynamically to prevent ghost data
     if (!OPLOVERZ_ENABLED) {
-      const filtered = cachedData.filter(item => item.source !== 'Oploverz');
-      return Response.json(filtered);
+      filtered = filtered.filter(item => item.source !== 'Oploverz');
     }
-    return Response.json(cachedData);
+    if (!ALQANIME_ENABLED) {
+      filtered = filtered.filter(item => item.source !== 'Alqanime');
+    }
+    return Response.json(filtered);
   }
 
   try {
-    // Fetch Otakudesu ongoing and Oploverz ongoing in parallel
-    const [otakuResult, oploverzResult] = await Promise.allSettled([
+    // Fetch Otakudesu ongoing, Oploverz ongoing, and Alqanime ongoing in parallel
+    const [otakuResult, oploverzResult, alqaResult] = await Promise.allSettled([
       fetchHtml('https://otakudesu.blog/').then(html => parseHomeList(html, 'ongoing')),
-      getLatestOploverz()
+      getLatestOploverz(),
+      getLatestAlqanime()
     ]);
 
     const otakuData = otakuResult.status === 'fulfilled' ? otakuResult.value : [];
     const oploverzData = oploverzResult.status === 'fulfilled' ? oploverzResult.value : [];
+    const alqaData = alqaResult.status === 'fulfilled' ? alqaResult.value : [];
 
     // Add source tag and normalize slugs for Oploverz items
     const normalizedOploverz = oploverzData.map(item => ({
@@ -35,13 +39,20 @@ export async function GET() {
       source: 'Oploverz'
     }));
 
+    // Add source tag and normalize slugs for Alqanime items
+    const normalizedAlqanime = alqaData.map(item => ({
+      ...item,
+      slug: `alqanime-${item.slug}`,
+      source: 'Alqanime'
+    }));
+
     // Deduplicate logic
     const merged = [];
     const matchedOploverzSlugs = new Set();
+    const matchedAlqanimeSlugs = new Set();
 
     // Helper to normalize titles and get core keywords (first 2 words)
     const getCoreKeywords = (title) => {
-      // 1. Remove season strings, brackets content, sub indo strings, and non-alphanumeric chars
       const clean = title.toLowerCase()
         .replace(/\([^)]*\)/g, '') // remove parentheses content: (Dogulwang), etc.
         .replace(/subtitle indonesia|sub indo|season|\bs\d+/gi, '')
@@ -50,35 +61,51 @@ export async function GET() {
         .trim();
       
       const words = clean.split(' ').filter(w => w.length > 1);
-      // Return first 2 words as core match criteria
       return words.slice(0, 2).join(' ');
     };
 
     otakuData.forEach(otakuItem => {
       const otakuCore = getCoreKeywords(otakuItem.title);
-      
-      const match = normalizedOploverz.find(opItem => {
+      const updatedItem = { ...otakuItem };
+
+      // Try matching Oploverz
+      const opMatch = normalizedOploverz.find(opItem => {
         if (matchedOploverzSlugs.has(opItem.slug)) return false;
         const opCore = getCoreKeywords(opItem.title);
-        // Match if core keywords overlap (e.g. 'tomb raider' === 'tomb raider' or 'clevatess' === 'clevatess')
         return otakuCore.length > 0 && opCore.length > 0 && (otakuCore.includes(opCore) || opCore.includes(otakuCore));
       });
 
-      if (match) {
-        matchedOploverzSlugs.add(match.slug);
-        merged.push({
-          ...otakuItem,
-          mirrorSlug: match.slug // Save the Oploverz episode/series slug for mirror switching
-        });
-      } else {
-        merged.push(otakuItem);
+      if (opMatch) {
+        matchedOploverzSlugs.add(opMatch.slug);
+        updatedItem.mirrorSlug = opMatch.slug;
       }
+
+      // Try matching Alqanime
+      const alqaMatch = normalizedAlqanime.find(alqaItem => {
+        if (matchedAlqanimeSlugs.has(alqaItem.slug)) return false;
+        const alqaCore = getCoreKeywords(alqaItem.title);
+        return otakuCore.length > 0 && alqaCore.length > 0 && (otakuCore.includes(alqaCore) || alqaCore.includes(otakuCore));
+      });
+
+      if (alqaMatch) {
+        matchedAlqanimeSlugs.add(alqaMatch.slug);
+        updatedItem.mirrorSlugAlqanime = alqaMatch.slug; // separate slug tracker for mirror links
+      }
+
+      merged.push(updatedItem);
     });
 
     // Add remaining Oploverz items
     normalizedOploverz.forEach(opItem => {
       if (!matchedOploverzSlugs.has(opItem.slug)) {
         merged.push(opItem);
+      }
+    });
+
+    // Add remaining Alqanime items
+    normalizedAlqanime.forEach(alqaItem => {
+      if (!matchedAlqanimeSlugs.has(alqaItem.slug)) {
+        merged.push(alqaItem);
       }
     });
     

@@ -84,6 +84,19 @@ export default function AnimeGrid({ title, items, moreLink, isBatch }) {
                       OPLOVERZ
                     </span>
                   )}
+                  {(item.source === 'Alqanime' || (item.slug && item.slug.startsWith('alqanime-'))) && (
+                    <span style={{ 
+                      fontSize: '0.65rem', 
+                      backgroundColor: 'rgba(46, 213, 115, 0.15)', 
+                      color: '#2ed573', 
+                      padding: '0.15rem 0.4rem', 
+                      borderRadius: '4px',
+                      fontWeight: '700',
+                      border: '1px solid rgba(46, 213, 115, 0.25)'
+                    }}>
+                      ALQANIME
+                    </span>
+                  )}
                 </div>
               </div>
             </Link>

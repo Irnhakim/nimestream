@@ -13,7 +13,8 @@ export async function GET(request) {
     'otakudesu.blog', 'otakudesu.cloud', 'otakudesu.ltd', 
     'i3.wp.com', 'i2.wp.com', 'i1.wp.com', 'i0.wp.com', 
     'cdn.otakudesu', 'kusonime.com', 'wp-content',
-    'oploverz.ac', 'oploverz.site', 'backapi.oploverz'
+    'oploverz.ac', 'oploverz.site', 'backapi.oploverz', 'alqanime.net',
+    'anichin.cafe', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime', 'animekompi', 'donghub', 'dramabox'
   ];
   const isAllowed = allowed.some(domain => imageUrl.includes(domain));
   if (!isAllowed) {
@@ -26,6 +27,16 @@ export async function GET(request) {
     referer = 'https://kusonime.com/';
   } else if (imageUrl.includes('oploverz.ac') || imageUrl.includes('oploverz.site')) {
     referer = 'https://oploverz.site/';
+  } else if (imageUrl.includes('alqanime.net')) {
+    referer = 'https://alqanime.net/';
+  } else if (imageUrl.includes('anichin.cafe')) {
+    referer = 'https://anichin.cafe/';
+  } else if (imageUrl.includes('samehadaku')) {
+    referer = 'https://samehadaku.vip/';
+  } else if (imageUrl.includes('animasu')) {
+    referer = 'https://animasu.cc/';
+  } else if (imageUrl.includes('kuramanime')) {
+    referer = 'https://kuramanime.net/';
   }
 
   try {
