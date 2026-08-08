@@ -93,7 +93,7 @@ export async function GET() {
         slug: `${key}-${cleanSeriesSlug(item.slug)}`,
         source: displayName,
         dayOrRating: todayName,
-        date: item.date && item.date !== 'Update' ? item.date : todayDateStr
+        date: item.date && item.date !== 'Update' ? item.date : 'Update'
       }));
       dynamicDataList.push({ key, displayName, data: normalized });
     });
@@ -104,7 +104,7 @@ export async function GET() {
       slug: `oploverz-${cleanSeriesSlug(item.slug)}`,
       source: 'Oploverz',
       dayOrRating: todayName,
-      date: item.date && item.date !== 'Ongoing' ? item.date : todayDateStr
+      date: item.date && item.date !== 'Ongoing' ? item.date : 'Ongoing'
     }));
 
     // Add source tag and normalize slugs for Alqanime items
@@ -113,7 +113,7 @@ export async function GET() {
       slug: `alqanime-${cleanSeriesSlug(item.slug)}`,
       source: 'Alqanime',
       dayOrRating: todayName,
-      date: item.date && item.date !== 'Update' ? item.date : todayDateStr
+      date: item.date && item.date !== 'Update' ? item.date : 'Update'
     }));
 
     // Deduplicate logic
@@ -206,13 +206,17 @@ export async function GET() {
     // Helper to check if an item is strictly ongoing (not batch/movie/completed)
     const isStrictlyOngoing = (item) => {
       const titleLower = item.title.toLowerCase();
+      const slugLower = (item.slug || '').toLowerCase();
       // Skip completed batches, movies, bds, and explicitly marked completed posts
       const isCompleted = titleLower.includes('batch') || 
                           titleLower.includes('movie') || 
                           titleLower.includes('bluray') || 
                           titleLower.includes(' bd') || 
                           titleLower.includes('tamat') ||
-                          titleLower.includes('complete');
+                          titleLower.includes('complete') ||
+                          slugLower.includes('tamat') ||
+                          slugLower.includes('-end') ||
+                          slugLower.includes('complete');
       return !isCompleted;
     };
 
