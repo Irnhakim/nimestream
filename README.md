@@ -90,11 +90,11 @@ npm run build
 
 ```text
 ├── app/                  # Direktori utama Next.js (App Router)
-├── components/           # Komponen reusable (Header, BookmarkButton, PageProgressBar, OnlineUsersCounter)
-├── lib/                  # Logika core scraper (scraper.js, kusonimeScraper.js, oploverzScraper.js, fileCache.js)
+│   ├── components/       # Komponen reusable (Header, BookmarkButton, PageProgressBar, OnlineUsersCounter, EpisodeStreamPlayer)
+│   └── globals.css       # Desain kustom Candy Dark Mode & mikro-animasi
+├── lib/                  # Logika core scraper (scraper.js, multiScraper.js, kusonimeScraper.js, oploverzScraper.js, fileCache.js)
 ├── public/               # File statik & gambar aset logo
-├── scratch/              # Script debug (Diabaikan oleh git)
-└── globals.css           # Desain kustom Candy Dark Mode & mikro-animasi
+└── tmp/                  # Cache disk file JSON lokal (Diabaikan oleh git)
 ```
 
 
