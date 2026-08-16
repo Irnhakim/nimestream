@@ -10,13 +10,24 @@ export async function GET(request) {
 
   // Only allow proxying images from allowed domains for security
   const allowed = [
-    'otakudesu.blog', 'otakudesu.cloud', 'otakudesu.ltd', 
-    'i3.wp.com', 'i2.wp.com', 'i1.wp.com', 'i0.wp.com', 
+    'otakudesu.blog', 'otakudesu.cloud', 'otakudesu.ltd',
+    'i3.wp.com', 'i2.wp.com', 'i1.wp.com', 'i0.wp.com',
     'cdn.otakudesu', 'kusonime.com', 'wp-content',
     'oploverz.ac', 'oploverz.site', 'backapi.oploverz', 'alqanime.net',
     'anichin.cafe', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime', 'animekompi', 'donghub', 'dramabox'
   ];
-  const isAllowed = allowed.some(domain => imageUrl.includes(domain));
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(imageUrl);
+  } catch (e) {
+    return new Response('Invalid URL', { status: 400 });
+  }
+
+  const hostname = parsedUrl.hostname;
+  const isAllowed = allowed.some(domain =>
+    hostname === domain || hostname.endsWith(`.${domain}`)
+  );
   if (!isAllowed) {
     return new Response('Forbidden', { status: 403 });
   }
@@ -58,8 +69,7 @@ export async function GET(request) {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      // Fallback redirect to direct URL if fetch failed but URL is reachable in browser
-      return Response.redirect(imageUrl, 302);
+      return new Response('Failed to fetch source image', { status: response.status });
     }
 
     const contentType = response.headers.get('content-type') || 'image/jpeg';
@@ -74,7 +84,7 @@ export async function GET(request) {
       },
     });
   } catch (err) {
-    console.error('Image proxy error, falling back to direct redirect:', err.message);
-    return Response.redirect(imageUrl, 302);
+    console.error('Image proxy error:', err.message);
+    return new Response('Error loading image', { status: 500 });
   }
 }
