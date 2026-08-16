@@ -64,6 +64,7 @@ export default function EpisodeBox({ episodes, animeTitle = '', anime = null }) 
     const queryParams = [];
     if (anime.mirrorSlug) queryParams.push(`oploverz=${encodeURIComponent(anime.mirrorSlug)}`);
     if (anime.mirrorSlugAlqanime) queryParams.push(`alqanime=${encodeURIComponent(anime.mirrorSlugAlqanime)}`);
+    if (anime.mirrorSlugOtakudesu) queryParams.push(`otakudesu=${encodeURIComponent(anime.mirrorSlugOtakudesu)}`);
     
     const sourceKeys = [
       'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 

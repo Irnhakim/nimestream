@@ -9,6 +9,26 @@ const sourceKeys = [
   'animekompi', 'donghub', 'dramabox'
 ];
 
+// Helper to fetch and parse Otakudesu episode mirrors
+const getOtakudesuEpisode = async (parentSlug, epNum) => {
+  try {
+    let html = null;
+    try {
+      html = await fetchHtml(`https://otakudesu.blog/episode/${parentSlug}-episode-${epNum}-sub-indo/`);
+    } catch {
+      try {
+        html = await fetchHtml(`https://otakudesu.blog/episode/${parentSlug}-episode-${epNum}-subtitle-indonesia/`);
+      } catch {
+        // Fallback: search Otakudesu for parentSlug and look for episode match if necessary
+        return null;
+      }
+    }
+    return parseEpisodeDetails(html);
+  } catch {
+    return null;
+  }
+};
+
 export async function GET(request, { params }) {
   const { slug } = await params;
   if (!slug) {
@@ -16,6 +36,7 @@ export async function GET(request, { params }) {
   }
 
   const { searchParams } = new URL(request.url);
+  const otakudesuParent = searchParams.get('otakudesu');
   const oploverzSlug = searchParams.get('oploverz');
   const alqanimeSlug = searchParams.get('alqanime');
   const dynSlugs = {};
@@ -23,78 +44,67 @@ export async function GET(request, { params }) {
     dynSlugs[k] = searchParams.get(k);
   });
 
-  // Dynamic sourceKeys routing check for multiScraper episode players
+  let data = null;
+  let originSource = 'Otakudesu';
+  let matchedKey = null;
+
   for (const key of sourceKeys) {
     if (slug.startsWith(`${key}-`)) {
-      try {
-        const realSlug = slug.replace(`${key}-`, '');
-        const data = await getEpisodeFromSource(key, realSlug);
-        if (!data) {
-          return Response.json({ error: `Episode not found on ${key}` }, { status: 404 });
-        }
-        return Response.json(data);
-      } catch (e) {
-        return Response.json({ error: e.message }, { status: 500 });
-      }
+      matchedKey = key;
+      break;
     }
   }
 
-  // Route matching for Oploverz source
-  if (slug.startsWith('oploverz-')) {
-    try {
+  try {
+    if (matchedKey) {
+      originSource = matchedKey.charAt(0).toUpperCase() + matchedKey.slice(1);
+      const realSlug = slug.replace(`${matchedKey}-`, '');
+      data = await getEpisodeFromSource(matchedKey, realSlug);
+    } else if (slug.startsWith('oploverz-')) {
+      originSource = 'Oploverz';
       const match = slug.match(/^oploverz-([a-z0-9-]+)-episode-([0-9.]+)$/i);
       if (!match) {
         return Response.json({ error: 'Invalid Oploverz episode slug format' }, { status: 400 });
       }
       const seriesSlug = match[1];
       const epNumber = match[2];
-      const data = await getOploverzEpisode(seriesSlug, epNumber);
-      if (!data) {
-        return Response.json({ error: 'Episode not found on Oploverz' }, { status: 404 });
-      }
-      return Response.json(data);
-    } catch (e) {
-      return Response.json({ error: e.message }, { status: 500 });
-    }
-  }
-
-  // Route matching for Alqanime source
-  if (slug.startsWith('alqanime-')) {
-    try {
+      data = await getOploverzEpisode(seriesSlug, epNumber);
+    } else if (slug.startsWith('alqanime-')) {
+      originSource = 'Alqanime';
       const realSlug = slug.replace('alqanime-', '');
-      const data = await getAlqanimeEpisode(realSlug);
-      if (!data) {
-        return Response.json({ error: 'Episode not found on Alqanime' }, { status: 404 });
-      }
-      return Response.json(data);
-    } catch (e) {
-      return Response.json({ error: e.message }, { status: 500 });
+      data = await getAlqanimeEpisode(realSlug);
+    } else {
+      // Otakudesu
+      const html = await fetchHtml(`https://otakudesu.blog/episode/${slug}/`);
+      data = parseEpisodeDetails(html);
     }
-  }
 
-  try {
-    const html = await fetchHtml(`https://otakudesu.blog/episode/${slug}/`);
-    const data = parseEpisodeDetails(html);
+    if (!data) {
+      return Response.json({ error: 'Episode not found' }, { status: 404 });
+    }
 
-    // Label Otakudesu mirrors
+    // Label origin mirrors
     if (data.mirrors) {
       data.mirrors = data.mirrors.map(m => ({
         ...m,
-        server: m.server,
-        source: 'Otakudesu'
+        source: originSource
       }));
+    } else {
+      data.mirrors = [];
     }
 
-    // Label Otakudesu downloads
+    // Label origin downloads
     if (data.downloads) {
       data.downloads = data.downloads.map(dl => ({
         ...dl,
-        source: 'Otakudesu'
+        source: originSource
       }));
+    } else {
+      data.downloads = [];
     }
 
-    // If animeSlug is parsed, fetch parent anime detail page to get high-quality portrait cover
-    if (data.animeSlug) {
+    // Extract high quality portrait cover if parent anime details are loaded (only for Otakudesu origin)
+    if (originSource === 'Otakudesu' && data.animeSlug) {
       try {
         const parentHtml = await fetchHtml(`https://otakudesu.blog/anime/${data.animeSlug}/`);
         const coverMatch = parentHtml.match(/class=["']fotoanime["'][^>]*>\s*<img[^>]+src=["']([^"']+)["']/i)
@@ -102,102 +112,103 @@ export async function GET(request, { params }) {
         if (coverMatch && coverMatch[1]) {
           data.thumb = coverMatch[1];
         }
-
-        const cleanParentSlug = data.animeSlug.replace('-sub-indo', '').replace('-subtitle-indonesia', '');
-        const epNumberMatch = slug.match(/-episode-(\d+)/i);
-        const epNumber = epNumberMatch ? epNumberMatch[1] : null;
-
-        if (epNumber) {
-          const { getSourceConfig } = require('@/lib/multiScraper');
-          const activeSources = sourceKeys.filter(k => getSourceConfig(k).enabled);
-
-          // Use parameters passed from anime detail page or fallback to predicted slug
-          const targetOploSlug = oploverzSlug ? oploverzSlug.replace('oploverz-', '') : cleanParentSlug;
-          const targetAlqaSlug = alqanimeSlug ? alqanimeSlug.replace('alqanime-', '') : cleanParentSlug;
-
-          // Fetch Oploverz, Alqanime, & dynamic sources mirrors concurrently
-          const promises = [
-            getOploverzEpisode(targetOploSlug, epNumber).catch(() => null),
-            getAlqanimeEpisode(`${targetAlqaSlug}-episode-${epNumber}`).catch(() => null),
-            ...activeSources.map(async (key) => {
-              const dynSlug = dynSlugs[key] ? dynSlugs[key].replace(`${key}-`, '') : cleanParentSlug;
-              // Try standard themesia slug patterns
-              try {
-                return await getEpisodeFromSource(key, `${dynSlug}-episode-${epNumber}`);
-              } catch {
-                try {
-                  return await getEpisodeFromSource(key, `${dynSlug}-ep-${epNumber}`);
-                } catch {
-                  return null;
-                }
-              }
-            })
-          ];
-
-          const results = await Promise.allSettled(promises);
-
-          // Merge Oploverz mirrors
-          if (results[0].status === 'fulfilled' && results[0].value) {
-            const oploData = results[0].value;
-            const oploMirrors = oploData.mirrors.map(m => ({
-              ...m,
-              server: m.server,
-              source: 'Oploverz'
-            }));
-            data.mirrors = [...(data.mirrors || []), ...oploMirrors];
-
-            const oploDownloads = oploData.downloads.map(dl => ({
-              ...dl,
-              quality: dl.quality,
-              source: 'Oploverz'
-            }));
-            data.downloads = [...(data.downloads || []), ...oploDownloads];
-          }
-
-          // Merge Alqanime mirrors
-          if (results[1].status === 'fulfilled' && results[1].value) {
-            const alqaData = results[1].value;
-            const alqaMirrors = alqaData.mirrors.map(m => ({
-              ...m,
-              server: m.server,
-              source: 'Alqanime'
-            }));
-            data.mirrors = [...(data.mirrors || []), ...alqaMirrors];
-
-            const alqaDownloads = alqaData.downloads.map(dl => ({
-              ...dl,
-              quality: dl.quality,
-              source: 'Alqanime'
-            }));
-            data.downloads = [...(data.downloads || []), ...alqaDownloads];
-          }
-
-          // Merge Dynamic Sources mirrors
-          activeSources.forEach((key, idx) => {
-            const resIndex = 2 + idx;
-            const sourceName = key.charAt(0).toUpperCase() + key.slice(1);
-            if (results[resIndex].status === 'fulfilled' && results[resIndex].value) {
-              const dynData = results[resIndex].value;
-              
-              const dynMirrors = (dynData.mirrors || []).map(m => ({
-                ...m,
-                server: m.server,
-                source: sourceName
-              }));
-              data.mirrors = [...(data.mirrors || []), ...dynMirrors];
-
-              const dynDownloads = (dynData.downloads || []).map(dl => ({
-                ...dl,
-                quality: dl.quality,
-                source: sourceName
-              }));
-              data.downloads = [...(data.downloads || []), ...dynDownloads];
-            }
-          });
-        }
       } catch (err) {
-        console.error('Failed to parse parent anime cover or fetch dynamic mirrors:', err);
+        console.error('Failed to fetch parent cover for Otakudesu episode:', err);
       }
+    }
+
+    // Extract episode number
+    let epNumber = null;
+    const epNumberMatch = slug.match(/-episode-(\d+)/i) 
+      || slug.match(/-ep-(\d+)/i) 
+      || (data.title && data.title.match(/(?:episode|ep)\s*(\d+)/i));
+    if (epNumberMatch) {
+      epNumber = epNumberMatch[1];
+    }
+
+    // Extract clean parent slug
+    let cleanParentSlug = '';
+    if (data.animeSlug) {
+      cleanParentSlug = data.animeSlug.replace('-sub-indo', '').replace('-subtitle-indonesia', '');
+    } else {
+      cleanParentSlug = slug.split('-episode-')[0].split('-ep-')[0].replace('oploverz-', '').replace('alqanime-', '');
+      for (const key of sourceKeys) {
+        cleanParentSlug = cleanParentSlug.replace(`${key}-`, '');
+      }
+    }
+
+    if (epNumber) {
+      const { getSourceConfig } = require('@/lib/multiScraper');
+      const activeSources = sourceKeys.filter(k => getSourceConfig(k).enabled);
+
+      const promises = [];
+      const searchTargets = [];
+
+      // Fetch Otakudesu mirror if not origin
+      if (originSource !== 'Otakudesu') {
+        const targetOtakuSlug = otakudesuParent || cleanParentSlug;
+        promises.push(getOtakudesuEpisode(targetOtakuSlug, epNumber).catch(() => null));
+        searchTargets.push('Otakudesu');
+      }
+
+      // Fetch Oploverz mirror if not origin
+      if (originSource !== 'Oploverz') {
+        const targetOploSlug = oploverzSlug ? oploverzSlug.replace('oploverz-', '') : cleanParentSlug;
+        promises.push(getOploverzEpisode(targetOploSlug, epNumber).catch(() => null));
+        searchTargets.push('Oploverz');
+      }
+
+      // Fetch Alqanime mirror if not origin
+      if (originSource !== 'Alqanime') {
+        const targetAlqaSlug = alqanimeSlug ? alqanimeSlug.replace('alqanime-', '') : cleanParentSlug;
+        promises.push(getAlqanimeEpisode(`${targetAlqaSlug}-episode-${epNumber}`).catch(() => null));
+        searchTargets.push('Alqanime');
+      }
+
+      // Fetch active dynamic multi-scraper sources
+      activeSources.forEach(key => {
+        const displayName = key.charAt(0).toUpperCase() + key.slice(1);
+        if (originSource !== displayName) {
+          const dynSlug = dynSlugs[key] ? dynSlugs[key].replace(`${key}-`, '') : cleanParentSlug;
+          promises.push((async () => {
+            try {
+              return await getEpisodeFromSource(key, `${dynSlug}-episode-${epNumber}`);
+            } catch {
+              try {
+                return await getEpisodeFromSource(key, `${dynSlug}-ep-${epNumber}`);
+              } catch {
+                return null;
+              }
+            }
+          })().catch(() => null));
+          searchTargets.push(displayName);
+        }
+      });
+
+      const results = await Promise.allSettled(promises);
+
+      results.forEach((result, idx) => {
+        if (result.status === 'fulfilled' && result.value) {
+          const targetSource = searchTargets[idx];
+          const srcData = result.value;
+
+          if (srcData.mirrors) {
+            const mappedMirrors = srcData.mirrors.map(m => ({
+              ...m,
+              source: targetSource
+            }));
+            data.mirrors = [...data.mirrors, ...mappedMirrors];
+          }
+
+          if (srcData.downloads) {
+            const mappedDownloads = srcData.downloads.map(dl => ({
+              ...dl,
+              source: targetSource
+            }));
+            data.downloads = [...data.downloads, ...mappedDownloads];
+          }
+        }
+      });
     }
 
     return Response.json(data);

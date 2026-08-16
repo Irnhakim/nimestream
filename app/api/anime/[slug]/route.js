@@ -1,8 +1,14 @@
-import { fetchHtml, parseAnimeDetails } from '@/lib/scraper';
+import { fetchHtml, parseAnimeDetails, parseSearchList } from '@/lib/scraper';
 import { getFileCache } from '@/lib/fileCache';
 import { getOploverzDetails } from '@/lib/oploverzScraper';
 import { getAlqanimeDetails } from '@/lib/alqanimeScraper';
 import { getDetailsFromSource } from '@/lib/multiScraper';
+
+const sourceKeys = [
+  'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 
+  'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime', 
+  'animekompi', 'donghub', 'dramabox'
+];
 
 export async function GET(request, { params }) {
   const { slug } = await params;
@@ -10,65 +16,44 @@ export async function GET(request, { params }) {
     return Response.json({ error: 'Missing slug' }, { status: 400 });
   }
 
-  // List of new dynamic prefix keys from multiScraper
-  const sourceKeys = [
-    'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 
-    'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime', 
-    'animekompi', 'donghub', 'dramabox'
-  ];
+  let data = null;
+  let originSource = 'Otakudesu';
+  let matchedKey = null;
 
+  // Detect which source the slug belongs to
   for (const key of sourceKeys) {
     if (slug.startsWith(`${key}-`)) {
-      try {
-        const realSlug = slug.replace(`${key}-`, '');
-        const data = await getDetailsFromSource(key, realSlug);
-        if (!data) {
-          return Response.json({ error: `Anime not found on ${key}` }, { status: 404 });
-        }
-        data.slug = slug;
-        return Response.json(data);
-      } catch (e) {
-        return Response.json({ error: e.message }, { status: 500 });
-      }
-    }
-  }
-
-  // Route routing for Oploverz source
-  if (slug.startsWith('oploverz-')) {
-    try {
-      const realSlug = slug.replace('oploverz-', '');
-      const data = await getOploverzDetails(realSlug);
-      if (!data) {
-        return Response.json({ error: 'Anime not found on Oploverz' }, { status: 404 });
-      }
-      data.slug = slug;
-      return Response.json(data);
-    } catch (e) {
-      return Response.json({ error: e.message }, { status: 500 });
-    }
-  }
-
-  // Route routing for Alqanime source
-  if (slug.startsWith('alqanime-')) {
-    try {
-      const realSlug = slug.replace('alqanime-', '');
-      const data = await getAlqanimeDetails(realSlug);
-      if (!data) {
-        return Response.json({ error: 'Anime not found on Alqanime' }, { status: 404 });
-      }
-      data.slug = slug;
-      return Response.json(data);
-    } catch (e) {
-      return Response.json({ error: e.message }, { status: 500 });
+      matchedKey = key;
+      break;
     }
   }
 
   try {
-    const html = await fetchHtml(`https://otakudesu.blog/anime/${slug}/`);
-    const data = parseAnimeDetails(html, slug);
+    if (matchedKey) {
+      originSource = matchedKey.charAt(0).toUpperCase() + matchedKey.slice(1);
+      const realSlug = slug.replace(`${matchedKey}-`, '');
+      data = await getDetailsFromSource(matchedKey, realSlug);
+    } else if (slug.startsWith('oploverz-')) {
+      originSource = 'Oploverz';
+      const realSlug = slug.replace('oploverz-', '');
+      data = await getOploverzDetails(realSlug);
+    } else if (slug.startsWith('alqanime-')) {
+      originSource = 'Alqanime';
+      const realSlug = slug.replace('alqanime-', '');
+      data = await getAlqanimeDetails(realSlug);
+    } else {
+      // Otakudesu
+      const html = await fetchHtml(`https://otakudesu.blog/anime/${slug}/`);
+      data = parseAnimeDetails(html, slug);
+    }
+
+    if (!data) {
+      return Response.json({ error: 'Anime not found' }, { status: 404 });
+    }
+
     data.slug = slug;
 
-    // Search and auto-resolve mirror slugs from other sources in real-time
+    // Search and auto-resolve mirror slugs from other sources in real-time based on title
     try {
       const titleQuery = data.title;
       const { searchOploverz } = require('@/lib/oploverzScraper');
@@ -76,6 +61,15 @@ export async function GET(request, { params }) {
       const { searchFromSource, getSourceConfig } = require('@/lib/multiScraper');
       
       const activeSources = sourceKeys.filter(key => getSourceConfig(key).enabled);
+
+      const searchOtakudesu = async (query) => {
+        try {
+          const html = await fetchHtml(`https://otakudesu.blog/?s=${encodeURIComponent(query)}&post_type=anime`);
+          return parseSearchList(html);
+        } catch {
+          return [];
+        }
+      };
       
       const getSeason = (titleStr) => {
         const t = titleStr.toLowerCase();
@@ -104,38 +98,50 @@ export async function GET(request, { params }) {
         return n1.includes(n2) || n2.includes(n1);
       };
 
-      const searchPromises = [
-        searchOploverz(titleQuery).catch(() => []),
-        searchAlqanime(titleQuery).catch(() => []),
-        ...activeSources.map(key => searchFromSource(key, titleQuery).catch(() => []))
-      ];
+      const searchPromises = [];
+      const searchTargets = [];
+
+      // Add target search sources dynamically except the origin source
+      if (originSource !== 'Otakudesu') {
+        searchPromises.push(searchOtakudesu(titleQuery).catch(() => []));
+        searchTargets.push('Otakudesu');
+      }
+
+      if (originSource !== 'Oploverz') {
+        searchPromises.push(searchOploverz(titleQuery).catch(() => []));
+        searchTargets.push('Oploverz');
+      }
+
+      if (originSource !== 'Alqanime') {
+        searchPromises.push(searchAlqanime(titleQuery).catch(() => []));
+        searchTargets.push('Alqanime');
+      }
+
+      activeSources.forEach(key => {
+        const displayName = key.charAt(0).toUpperCase() + key.slice(1);
+        if (originSource !== displayName) {
+          searchPromises.push(searchFromSource(key, titleQuery).catch(() => []));
+          searchTargets.push(displayName);
+        }
+      });
 
       const searchResults = await Promise.allSettled(searchPromises);
 
-      // Match Oploverz
-      if (searchResults[0].status === 'fulfilled' && searchResults[0].value) {
-        const oploMatch = searchResults[0].value.find(item => isMatch(titleQuery, item.title));
-        if (oploMatch) {
-          data.mirrorSlug = `oploverz-${oploMatch.slug}`;
-        }
-      }
-
-      // Match Alqanime
-      if (searchResults[1].status === 'fulfilled' && searchResults[1].value) {
-        const alqaMatch = searchResults[1].value.find(item => isMatch(titleQuery, item.title));
-        if (alqaMatch) {
-          data.mirrorSlugAlqanime = `alqanime-${alqaMatch.slug}`;
-        }
-      }
-
-      // Match Dynamic Sources
-      activeSources.forEach((key, idx) => {
-        const resIdx = 2 + idx;
-        if (searchResults[resIdx].status === 'fulfilled' && searchResults[resIdx].value) {
-          const dynMatch = searchResults[resIdx].value.find(item => isMatch(titleQuery, item.title));
-          if (dynMatch) {
-            const displayName = key.charAt(0).toUpperCase() + key.slice(1);
-            data[`mirrorSlug${displayName}`] = `${key}-${dynMatch.slug}`;
+      searchResults.forEach((result, idx) => {
+        if (result.status === 'fulfilled' && result.value) {
+          const targetSource = searchTargets[idx];
+          const match = result.value.find(item => isMatch(titleQuery, item.title));
+          
+          if (match) {
+            if (targetSource === 'Otakudesu') {
+              data.mirrorSlugOtakudesu = match.slug;
+            } else if (targetSource === 'Oploverz') {
+              data.mirrorSlug = `oploverz-${match.slug}`;
+            } else if (targetSource === 'Alqanime') {
+              data.mirrorSlugAlqanime = `alqanime-${match.slug}`;
+            } else {
+              data[`mirrorSlug${targetSource}`] = `${targetSource.toLowerCase()}-${match.slug}`;
+            }
           }
         }
       });
@@ -149,26 +155,15 @@ export async function GET(request, { params }) {
 
     if (targetGenres.length > 0) {
       try {
-        // Retrieve lists from file cache (quick & RAM-efficient)
         const ongoingList = getFileCache('ongoing_list', 24 * 60 * 60 * 1000) || [];
-        // Look up completed list cache (let's check completed endpoint cache key)
         const completedList = getFileCache('completed_list', 24 * 60 * 60 * 1000) || [];
-        
-        // Merge list
         const pool = [...ongoingList, ...completedList];
         
         if (pool.length > 0) {
           const scored = pool
-            .filter(item => item.slug !== slug) // exclude itself
+            .filter(item => item.slug !== slug)
             .map(item => {
-              // Parse item genres if present, or search for keyword matching
-              // Since ongoing list parsed items have dayOrRating and ep but not full genres,
-              // we can do a fallback matching. But wait! If we cannot find genres in list items,
-              // let's do title word-matching or genre matching if Kusonime/Otakudesu lists contain genres.
-              // Let's calculate score by title overlap & shared tags
               let score = 0;
-              
-              // 1. Calculate word overlap in titles
               const cleanTargetTitle = data.title.toLowerCase().replace(/[^a-z0-9\s]/g, '');
               const cleanItemTitle = item.title.toLowerCase().replace(/[^a-z0-9\s]/g, '');
               
@@ -176,19 +171,17 @@ export async function GET(request, { params }) {
               const itemWords = cleanItemTitle.split(' ').filter(w => w.length > 3);
               
               const commonWords = targetWords.filter(w => itemWords.includes(w));
-              score += commonWords.length * 3; // high weight for same series name/sequels
+              score += commonWords.length * 3;
 
-              // 2. Fallback rating match
               if (item.dayOrRating && /^\d+(\.\d+)?$/.test(item.dayOrRating)) {
-                score += parseFloat(item.dayOrRating) * 0.1; // slight preference for higher rated
+                score += parseFloat(item.dayOrRating) * 0.1;
               }
 
               return { ...item, score };
             })
-            .filter(item => item.score > 0 || Math.random() > 0.7) // mix some randomized values if score is 0
+            .filter(item => item.score > 0 || Math.random() > 0.7)
             .sort((a, b) => b.score - a.score);
 
-          // Get top 6 unique recommendations
           const uniqueSlugs = new Set();
           for (const item of scored) {
             if (!uniqueSlugs.has(item.slug)) {
