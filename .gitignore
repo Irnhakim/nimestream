@@ -45,3 +45,8 @@ next-env.d.ts
 
 # scratch testing scripts
 /scratch/*
+
+# CLAUDE.md
+CLAUDE.md
+
+.claude/
