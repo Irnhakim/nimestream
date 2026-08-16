@@ -80,6 +80,15 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
 
   const resolveMirror = async (mirror, index) => {
     if (activeMirror === index) return;
+
+    // Direct URLs (non-Otakudesu streams) can be set directly to iframe src
+    const isDirectUrl = /^(https?:)?\/\//i.test(mirror.content);
+    if (isDirectUrl || (mirror.source && mirror.source !== 'Otakudesu')) {
+      setCurrentIframeSrc(mirror.content);
+      setActiveMirror(index);
+      return;
+    }
+
     setResolving(true);
     setActiveMirror(index);
     try {
