@@ -137,6 +137,18 @@ export async function GET(request, { params }) {
       }
     }
 
+    // Helper to extract episode number (needed for matching)
+    const getEpisodeNumberVal = (titleStr) => {
+      if (!titleStr) return null;
+      const match = titleStr.match(/(?:episode|ep)\s*\.?\s*(\d+(?:\.\d+)?)/i);
+      if (match) return parseFloat(match[1]);
+      const allNums = titleStr.match(/(\d+(?:\.\d+)?)/g);
+      if (allNums && allNums.length > 0) {
+        return parseFloat(allNums[allNums.length - 1]);
+      }
+      return null;
+    };
+
     if (epNumber) {
       const { getSourceConfig } = require('@/lib/multiScraper');
       const activeSources = sourceKeys.filter(k => getSourceConfig(k).enabled);
@@ -160,8 +172,37 @@ export async function GET(request, { params }) {
 
       // Fetch Alqanime mirror if not origin
       if (originSource !== 'Alqanime') {
-        const targetAlqaSlug = alqanimeSlug ? alqanimeSlug.replace('alqanime-', '') : cleanParentSlug;
-        promises.push(getAlqanimeEpisode(`${targetAlqaSlug}-episode-${epNumber}`).catch(() => null));
+        promises.push((async () => {
+          const targetAlqaSlug = alqanimeSlug ? alqanimeSlug.replace('alqanime-', '') : cleanParentSlug;
+          let exactAlqaEpSlug = null;
+          try {
+            const parentData = await getAlqanimeDetails(targetAlqaSlug);
+            if (parentData && parentData.episodes) {
+              const targetEpNum = parseFloat(epNumber);
+              const matchedEp = parentData.episodes.find(ep => {
+                const num = getEpisodeNumberVal(ep.title);
+                return num !== null && num === targetEpNum;
+              });
+              if (matchedEp) {
+                exactAlqaEpSlug = matchedEp.slug.replace('alqanime-', '');
+              }
+            }
+          } catch {}
+
+          if (exactAlqaEpSlug) {
+            try {
+              const epData = await getAlqanimeEpisode(exactAlqaEpSlug);
+              if (epData) return epData;
+            } catch {}
+          }
+
+          // Fallback
+          try {
+            return await getAlqanimeEpisode(`${targetAlqaSlug}-episode-${epNumber}`);
+          } catch {
+            return null;
+          }
+        })().catch(() => null));
         searchTargets.push('Alqanime');
       }
 
@@ -169,8 +210,32 @@ export async function GET(request, { params }) {
       activeSources.forEach(key => {
         const displayName = key.charAt(0).toUpperCase() + key.slice(1);
         if (originSource !== displayName) {
-          const dynSlug = dynSlugs[key] ? dynSlugs[key].replace(`${key}-`, '') : cleanParentSlug;
           promises.push((async () => {
+            const dynSlug = dynSlugs[key] ? dynSlugs[key].replace(`${key}-`, '') : cleanParentSlug;
+            let exactEpSlug = null;
+            
+            try {
+              const parentData = await getDetailsFromSource(key, dynSlug);
+              if (parentData && parentData.episodes) {
+                const targetEpNum = parseFloat(epNumber);
+                const matchedEp = parentData.episodes.find(ep => {
+                  const num = getEpisodeNumberVal(ep.title);
+                  return num !== null && num === targetEpNum;
+                });
+                if (matchedEp) {
+                  exactEpSlug = matchedEp.slug.replace(`${key}-`, '');
+                }
+              }
+            } catch (err) {}
+
+            if (exactEpSlug) {
+              try {
+                const epData = await getEpisodeFromSource(key, exactEpSlug);
+                if (epData) return epData;
+              } catch {}
+            }
+
+            // Fallback: try standard predicted themesia patterns
             try {
               return await getEpisodeFromSource(key, `${dynSlug}-episode-${epNumber}`);
             } catch {
@@ -208,6 +273,12 @@ export async function GET(request, { params }) {
             data.downloads = [...data.downloads, ...mappedDownloads];
           }
         }
+      });
+      // Log merged episode players & downloads summary
+      console.log(`[Multi-Scraper Episode Merger] Merged sources for "${data.title || slug}" (${originSource} slug: ${slug}):`, {
+        mirrorsCount: data.mirrors?.length || 0,
+        downloadsCount: data.downloads?.length || 0,
+        sourcesMerged: [...new Set((data.mirrors || []).map(m => m.source))]
       });
     }
 

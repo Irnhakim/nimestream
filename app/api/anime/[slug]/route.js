@@ -145,6 +145,17 @@ export async function GET(request, { params }) {
           }
         }
       });
+      // Log resolved mirror slugs summary to server console
+      const resolvedLog = {
+        Otakudesu: data.mirrorSlugOtakudesu || 'Not Found',
+        Oploverz: data.mirrorSlug || 'Not Found',
+        Alqanime: data.mirrorSlugAlqanime || 'Not Found'
+      };
+      activeSources.forEach(key => {
+        const displayName = key.charAt(0).toUpperCase() + key.slice(1);
+        resolvedLog[displayName] = data[`mirrorSlug${displayName}`] || 'Not Found';
+      });
+      console.log(`[Multi-Scraper Anime Matcher] Resolved mirrors for "${titleQuery}" (${originSource} slug: ${slug}):`, resolvedLog);
     } catch (e) {
       console.error('Failed to auto-resolve mirror slugs in detail page:', e);
     }
