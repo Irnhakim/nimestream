@@ -1,11 +1,31 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function EpisodeBox({ episodes, animeTitle = '', anime = null }) {
   const [search, setSearch] = useState('');
   const [order, setOrder] = useState('desc'); // desc = terbaru dulu
+  const [resolvedAnime, setResolvedAnime] = useState(anime);
+
+  useEffect(() => {
+    setResolvedAnime(anime);
+    if (!anime) return;
+    fetch(`/api/anime/${anime.slug}/mirrors?title=${encodeURIComponent(anime.title)}`)
+      .then(res => {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then(mirrorsData => {
+        if (mirrorsData) {
+          setResolvedAnime(prev => ({
+            ...prev,
+            ...mirrorsData
+          }));
+        }
+      })
+      .catch(err => console.error('Failed to resolve background mirrors:', err));
+  }, [anime]);
 
   const getEpisodeNumber = (title) => {
     if (!title) return 0;
@@ -60,11 +80,11 @@ export default function EpisodeBox({ episodes, animeTitle = '', anime = null }) 
 
   // Build query params for mirror sources
   const getEpisodeQueryString = () => {
-    if (!anime) return '';
+    if (!resolvedAnime) return '';
     const queryParams = [];
-    if (anime.mirrorSlug) queryParams.push(`oploverz=${encodeURIComponent(anime.mirrorSlug)}`);
-    if (anime.mirrorSlugAlqanime) queryParams.push(`alqanime=${encodeURIComponent(anime.mirrorSlugAlqanime)}`);
-    if (anime.mirrorSlugOtakudesu) queryParams.push(`otakudesu=${encodeURIComponent(anime.mirrorSlugOtakudesu)}`);
+    if (resolvedAnime.mirrorSlug) queryParams.push(`oploverz=${encodeURIComponent(resolvedAnime.mirrorSlug)}`);
+    if (resolvedAnime.mirrorSlugAlqanime) queryParams.push(`alqanime=${encodeURIComponent(resolvedAnime.mirrorSlugAlqanime)}`);
+    if (resolvedAnime.mirrorSlugOtakudesu) queryParams.push(`otakudesu=${encodeURIComponent(resolvedAnime.mirrorSlugOtakudesu)}`);
     
     const sourceKeys = [
       'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 
@@ -74,8 +94,8 @@ export default function EpisodeBox({ episodes, animeTitle = '', anime = null }) 
     sourceKeys.forEach(key => {
       const displayName = key.charAt(0).toUpperCase() + key.slice(1);
       const attr = `mirrorSlug${displayName}`;
-      if (anime[attr]) {
-        queryParams.push(`${key}=${encodeURIComponent(anime[attr])}`);
+      if (resolvedAnime[attr]) {
+        queryParams.push(`${key}=${encodeURIComponent(resolvedAnime[attr])}`);
       }
     });
 
