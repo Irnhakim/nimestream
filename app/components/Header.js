@@ -72,7 +72,6 @@ export default function Header() {
 
         {/* Right side controls for mobile */}
         <div style={{ display: 'none', alignItems: 'center', gap: '0.5rem' }} className="mobile-controls-wrap">
-          <OnlineUsersCounter />
           {/* Hamburger Button (Mobile only) */}
           <button
             className="hamburger-btn"

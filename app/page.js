@@ -1,26 +1,18 @@
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 import AnimeGrid from './components/AnimeGrid';
-import { LOCAL_API_URL } from '@/lib/scraper';
+import { fetchHtml, parseHomeList } from '@/lib/scraper';
 import { getLatestKusonime } from '@/lib/kusonimeScraper';
 import ResumeWatchingBlock from './components/ResumeWatchingBlock';
 
-async function getData(endpoint) {
-  try {
-    const res = await fetch(`${LOCAL_API_URL}/api/${endpoint}`, {
-      cache: 'no-store'
-    });
-    if (!res.ok) return [];
-    return await res.json();
-  } catch (e) {
-    console.error(`Failed to fetch ${endpoint}:`, e);
-    return [];
-  }
-}
-
 export default async function Home() {
-  const ongoing = await getData('ongoing');
-  const completed = await getData('completed');
+  const [ongoingHtml, completedHtml] = await Promise.all([
+    fetchHtml('/').catch(() => ''),
+    fetchHtml('/').catch(() => ''),
+  ]);
+
+  const ongoing = ongoingHtml ? parseHomeList(ongoingHtml, 'ongoing') : [];
+  const completed = completedHtml ? parseHomeList(completedHtml, 'completed') : [];
 
   // Server-side fetch for Kusonime if enabled
   let latestBatch = [];

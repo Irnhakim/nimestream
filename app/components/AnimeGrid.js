@@ -19,8 +19,8 @@ export default function AnimeGrid({ title, items, moreLink, isBatch }) {
         {items.map((item, idx) => {
           const detailUrl = isBatch ? `/batch/kuso/${item.slug}` : `/anime/${item.slug}`;
           return (
-            <Link 
-              key={idx} 
+            <Link
+              key={item.slug || idx}
               href={detailUrl} 
               className="anime-card"
               style={isBatch ? { border: '1px solid rgba(176, 92, 255, 0.15)' } : {}}
