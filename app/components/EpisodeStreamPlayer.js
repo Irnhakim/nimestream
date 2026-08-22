@@ -149,7 +149,7 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
               <iframe
                 src={currentIframeSrc}
                 allowFullScreen={true}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation"
               />
             )}
           </div>

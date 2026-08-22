@@ -63,7 +63,7 @@ export async function GET(request) {
         'Accept-Encoding': 'gzip, deflate, br',
       },
       signal: controller.signal,
-      cache: 'no-store',
+      next: { revalidate: 86400 },
     });
 
     clearTimeout(timeoutId);
