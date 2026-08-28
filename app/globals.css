@@ -1,19 +1,19 @@
 :root {
-  /* Premium Deep Matte Dark Theme */
-  --bg-main: #0b0c10;
-  --bg-card: #12131c;
-  --bg-nav: rgba(11, 12, 16, 0.85);
+  /* Premium Deep Matte Dark Theme (Matched with Logo Colors) */
+  --bg-main: #0f1020;
+  --bg-card: #16172d;
+  --bg-nav: rgba(15, 16, 32, 0.85);
   --text-main: #f3f4f6;
   --text-muted: #9ca3af;
 
-  /* Modern Solid Accent Colors */
-  --color-accent: #6c5ce7;
-  --color-accent-hover: #5b4bc4;
-  --color-turquoise: #06b6d4;
+  /* Modern Solid Accent Colors (Directly from logo.svg) */
+  --color-accent: #b05cff;
+  --color-accent-hover: #943ae6;
+  --color-turquoise: #7cf4ff;
   --color-yellow: #f59e0b;
-  --color-pink: #ec4899;
+  --color-pink: #ff60c8;
 
-  --border-color: rgba(255, 255, 255, 0.06);
+  --border-color: rgba(176, 92, 255, 0.08);
   --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -156,7 +156,7 @@ header {
   flex-direction: column;
   gap: 0.75rem;
   padding: 0.75rem 1.25rem 1rem;
-  background: #0e0f14;
+  background: var(--bg-main);
   border-top: 1px solid var(--border-color);
   animation: slideDown 0.2s ease;
 }
@@ -256,7 +256,7 @@ main {
 footer {
   border-top: 1px solid var(--border-color);
   padding: 1.5rem 1rem;
-  background-color: #07080b;
+  background-color: #0a0a16;
   color: var(--text-muted);
   font-size: 0.75rem;
   text-align: center;
