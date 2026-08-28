@@ -62,8 +62,6 @@ export default async function AnimeDetailsPage({ params }) {
         </div>
 
         <div className="detail-main">
-          <h1 className="detail-title">{anime.title}</h1>
-          
           {anime.sinopsis && (
             <div>
               <h2 className="section-title">Sinopsis</h2>
