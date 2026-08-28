@@ -49,7 +49,7 @@ export default async function GenreCategoryPage({ params, searchParams }) {
                       loading="lazy"
                     />
                     {item.rating && (
-                      <div className="card-badge" style={{ background: 'linear-gradient(135deg, var(--color-candy-cyan), var(--color-candy-purple))' }}>
+                      <div className="card-badge-sub">
                         ★ {item.rating}
                       </div>
                     )}
@@ -96,8 +96,8 @@ export default async function GenreCategoryPage({ params, searchParams }) {
                       className="btn-mirror"
                       style={{
                         padding: '0.5rem 1rem',
-                        backgroundColor: pag.active ? 'var(--color-candy-pink)' : 'rgba(255,255,255,0.04)',
-                        borderColor: pag.active ? 'var(--color-candy-pink)' : 'rgba(255,255,255,0.05)'
+                        backgroundColor: pag.active ? 'var(--color-accent)' : 'rgba(255,255,255,0.04)',
+                        borderColor: pag.active ? 'var(--color-accent)' : 'rgba(255,255,255,0.05)'
                       }}
                     >
                       {pag.text.replace('&raquo;', '»').replace('&laquo;', '«')}

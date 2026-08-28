@@ -117,7 +117,7 @@ function SearchPageClient() {
                     loading="lazy"
                   />
                   {item.rating && (
-                    <div className="card-badge" style={{ background: 'linear-gradient(135deg, var(--color-candy-cyan), var(--color-candy-purple))' }}>
+                    <div className="card-badge-sub">
                       ★ {item.rating}
                     </div>
                   )}
@@ -135,7 +135,7 @@ function SearchPageClient() {
 
             {/* Render Kusonime (Batch) */}
             {showBatch && kusonimeResults.map((item, idx) => (
-              <Link key={`kuso-${idx}`} href={`/batch/kuso/${item.slug}`} className="anime-card" style={{ border: '1px solid rgba(176, 92, 255, 0.2)' }}>
+              <Link key={`kuso-${idx}`} href={`/batch/kuso/${item.slug}`} className="anime-card" style={{ borderColor: 'var(--color-accent)' }}>
                 <div className="card-img-wrapper">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -144,7 +144,7 @@ function SearchPageClient() {
                     className="card-img"
                     loading="lazy"
                   />
-                  <div className="card-badge" style={{ background: 'linear-gradient(135deg, var(--color-candy-purple), var(--color-candy-pink))' }}>
+                  <div className="card-badge">
                     📦 BATCH
                   </div>
                 </div>
@@ -182,13 +182,13 @@ export default function SearchPage() {
 function tabButtonStyle(isActive) {
   return {
     padding: '0.45rem 1rem',
-    borderRadius: '10px',
-    fontSize: '0.85rem',
-    fontWeight: '700',
+    borderRadius: '6px',
+    fontSize: '0.8rem',
+    fontWeight: '600',
     border: '1px solid',
-    borderColor: isActive ? 'var(--color-candy-purple)' : 'rgba(255,255,255,0.06)',
-    backgroundColor: isActive ? 'rgba(176, 92, 255, 0.1)' : 'rgba(255,255,255,0.03)',
-    color: isActive ? 'var(--color-candy-purple)' : 'var(--text-muted)',
+    borderColor: isActive ? 'var(--color-accent)' : 'var(--border-color)',
+    backgroundColor: isActive ? 'rgba(108, 92, 231, 0.08)' : 'rgba(255,255,255,0.02)',
+    color: isActive ? 'var(--color-turquoise)' : 'var(--text-muted)',
     cursor: 'pointer',
     transition: 'var(--transition-smooth)'
   };

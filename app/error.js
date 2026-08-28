@@ -12,73 +12,59 @@ export default function ErrorPage({ error, reset }) {
   // Determine error messages or codes dynamically
   const errorMessage = error?.message || '';
   let errorCode = '500';
-  let errorTitle = 'Jutsu Scraper Gagal!';
-  let errorDesc = 'Terjadi kesalahan sistem internal atau sumber data eksternal mengalami timeout.';
+  let errorTitle = 'Gagal Memuat Data!';
+  let errorDesc = 'Terjadi kesalahan sistem internal atau sumber data eksternal mengalami gangguan.';
 
   if (errorMessage.includes('403')) {
     errorCode = '403';
-    errorTitle = 'Akses Terlarang (Forbidden)';
-    errorDesc = 'Jalan Anda ter-block oleh barrier pelindung. Anda tidak memiliki izin untuk membuka segel halaman ini.';
+    errorTitle = 'Akses Ditolak';
+    errorDesc = 'Anda tidak memiliki izin untuk mengakses halaman ini.';
   } else if (errorMessage.includes('402')) {
     errorCode = '402';
-    errorTitle = 'Payment Required';
-    errorDesc = 'Halaman ini membutuhkan energi chakra premium (layanan berbayar) yang saat ini belum dikonfigurasi.';
+    errorTitle = 'Layanan Berbayar';
+    errorDesc = 'Halaman ini membutuhkan akses khusus yang saat ini belum dikonfigurasi.';
   } else if (errorMessage.includes('401')) {
     errorCode = '401';
-    errorTitle = 'Unauthorized';
-    errorDesc = 'Akses ditolak. Silakan login atau masukkan token enkripsi Anda terlebih dahulu.';
+    errorTitle = 'Butuh Otorisasi';
+    errorDesc = 'Silakan masuk atau verifikasi akun Anda terlebih dahulu untuk mengakses halaman ini.';
   }
 
   return (
-    <main style={{ 
-      minHeight: '80vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
+    <main style={{
+      minHeight: '80vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
       flexDirection: 'column',
       padding: '2rem',
       textAlign: 'center',
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* Background Neon Pulsing Glows */}
+      {/* Background Subtle Accent Glow */}
       <div style={{
         position: 'absolute',
         width: '320px',
         height: '320px',
-        background: 'radial-gradient(circle, rgba(255, 96, 151, 0.18) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(108, 92, 231, 0.08) 0%, transparent 70%)',
         top: '20%',
         right: '15%',
         zIndex: 0,
         pointerEvents: 'none',
         animation: 'pulseGlow 6s ease-in-out infinite'
       }} />
-      <div style={{
-        position: 'absolute',
-        width: '320px',
-        height: '320px',
-        background: 'radial-gradient(circle, rgba(176, 92, 255, 0.15) 0%, transparent 70%)',
-        bottom: '15%',
-        left: '15%',
-        zIndex: 0,
-        pointerEvents: 'none',
-        animation: 'pulseGlow 6s ease-in-out infinite 3s'
-      }} />
 
       {/* Main card panel */}
       <div style={{ position: 'relative', zIndex: 1, maxWidth: '600px' }}>
         <div style={{ animation: 'floatAnim 4s ease-in-out infinite', marginBottom: '2rem' }}>
-          <h1 
-            style={{ 
-              fontSize: '8.5rem', 
-              fontWeight: '900', 
+          <h1
+            style={{
+              fontSize: '8.5rem',
+              fontWeight: '900',
               margin: 0,
-              background: 'linear-gradient(135deg, var(--color-candy-purple), var(--color-candy-pink), var(--color-candy-yellow))',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: 'var(--color-accent)',
               letterSpacing: '-3px',
-              lineHeight: '1',
-              textShadow: '0 0 50px rgba(255, 96, 151, 0.3)'
+              lineHeight: '1'
             }}
           >
             {errorCode}
@@ -86,7 +72,7 @@ export default function ErrorPage({ error, reset }) {
           <div style={{
             fontSize: '1.25rem',
             fontWeight: '700',
-            color: 'var(--color-candy-pink)',
+            color: 'var(--color-pink)',
             marginTop: '0.6rem',
             letterSpacing: '0.12em',
             textTransform: 'uppercase'
@@ -96,7 +82,7 @@ export default function ErrorPage({ error, reset }) {
         </div>
 
         <h2 style={{ fontSize: '1.4rem', fontWeight: '700', marginBottom: '1.25rem', color: 'var(--text-main)' }}>
-          Kacau! {errorTitle} 🌀
+          Maaf, Terjadi Gangguan 🌀
         </h2>
         <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '2.5rem', fontSize: '0.95rem' }}>
           {errorDesc}
@@ -122,18 +108,16 @@ export default function ErrorPage({ error, reset }) {
             Ulangi Memuat (Retry)
           </button>
           
-          <Link 
-            href="/" 
-            className="btn-mirror"
-            style={{ 
-              padding: '0.8rem 2rem', 
+          <Link
+            href="/"
+            className="btn-all"
+            style={{
+              padding: '0.8rem 2rem',
               fontSize: '0.9rem',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
-              borderRadius: '9999px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              backgroundColor: 'rgba(255, 255, 255, 0.02)'
+              borderRadius: '6px'
             }}
           >
             Kembali ke Home

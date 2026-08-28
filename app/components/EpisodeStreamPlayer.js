@@ -10,10 +10,44 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
   const [resolving, setResolving] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(false);
   const [loadingMirrors, setLoadingMirrors] = useState(false);
+  const [isBlockedIframe, setIsBlockedIframe] = useState(false);
+
+  // Helper to format/sanitize mirror URLs before playing
+  const sanitizePlayerUrl = (url) => {
+    if (!url) return '';
+
+    // Fix Pixeldrain non-embed URL format:
+    // https://pixeldrain.com/u/abcde -> https://pixeldrain.com/api/file/abcde
+    if (url.includes('pixeldrain.com/u/')) {
+      return url.replace('pixeldrain.com/u/', 'pixeldrain.com/api/file/') + '?embed';
+    }
+    return url;
+  };
+
+  // List of domains known to block being loaded inside iframes
+  const checkIsBlockedIframe = (url) => {
+    if (!url) return false;
+    const lowerUrl = url.toLowerCase();
+    const blockedDomains = [
+      'desustream',
+      'odstream',
+      'mega.nz',
+      'mediafire.com',
+      'drive.google.com/file',
+      'google.com/open'
+    ];
+    // Pixeldrain blocks iframe unless using the api/file endpoint
+    if (lowerUrl.includes('pixeldrain.com') && !lowerUrl.includes('api/file')) {
+      return true;
+    }
+    return blockedDomains.some(domain => lowerUrl.includes(domain));
+  };
 
   useEffect(() => {
     setResolvedEpisode(episode);
-    setCurrentIframeSrc(episode.defaultStreamUrl);
+    const sanitizedDefault = sanitizePlayerUrl(episode.defaultStreamUrl);
+    setCurrentIframeSrc(sanitizedDefault);
+    setIsBlockedIframe(checkIsBlockedIframe(sanitizedDefault));
     setActiveMirror(null);
     setLoadingMirrors(true);
     setIframeLoading(false);
@@ -87,8 +121,17 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
     // Direct URLs (non-Otakudesu streams) can be set directly to iframe src
     const isDirectUrl = /^(https?:)?\/\//i.test(mirror.content);
     if (isDirectUrl || (mirror.source && mirror.source !== 'Otakudesu')) {
-      setCurrentIframeSrc(mirror.content);
+      const sanitizedUrl = sanitizePlayerUrl(mirror.content);
+      const isBlocked = checkIsBlockedIframe(sanitizedUrl);
+
+      setCurrentIframeSrc(sanitizedUrl);
+      setIsBlockedIframe(isBlocked);
       setActiveMirror(index);
+      setIframeLoading(false);
+
+      if (isBlocked) {
+        window.open(sanitizedUrl, '_blank');
+      }
       return;
     }
 
@@ -104,7 +147,15 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
       });
       const data = await res.json();
       if (data.src) {
-        setCurrentIframeSrc(data.src);
+        const sanitizedUrl = sanitizePlayerUrl(data.src);
+        const isBlocked = checkIsBlockedIframe(sanitizedUrl);
+
+        setCurrentIframeSrc(sanitizedUrl);
+        setIsBlockedIframe(isBlocked);
+
+        if (isBlocked) {
+          window.open(sanitizedUrl, '_blank');
+        }
       } else {
         alert('Gagal memuat mirror stream. Silakan pilih server lain.');
         setIframeLoading(false);
@@ -164,13 +215,41 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
               </div>
             ) : null}
 
-            <iframe
-              src={currentIframeSrc}
-              allowFullScreen={true}
-              referrerPolicy="no-referrer"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation"
-              onLoad={() => setIframeLoading(false)}
-            />
+            {isBlockedIframe ? (
+              <div style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                backgroundColor: '#050608', color: '#fff', padding: '1.5rem', textAlign: 'center',
+                zIndex: 8
+              }}>
+                <p style={{ marginBottom: '1rem', color: 'var(--color-candy-pink)', fontWeight: 'bold' }}>
+                  Server ini memblokir pemutaran langsung di dalam website (iframe embed).
+                </p>
+                <a
+                  href={currentIframeSrc}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-download"
+                  style={{
+                    padding: '0.6rem 1.2rem',
+                    fontSize: '0.9rem',
+                    borderRadius: '8px',
+                    boxShadow: '0 0 15px rgba(176, 92, 255, 0.4)',
+                    background: 'linear-gradient(135deg, var(--color-candy-purple), var(--color-candy-pink))'
+                  }}
+                >
+                  🚀 Tonton di Tab Baru (External Player)
+                </a>
+              </div>
+            ) : (
+              <iframe
+                src={currentIframeSrc}
+                allowFullScreen={true}
+                referrerPolicy="no-referrer"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation"
+                onLoad={() => setIframeLoading(false)}
+              />
+            )}
           </div>
         </div>
 

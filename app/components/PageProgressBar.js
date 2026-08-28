@@ -80,10 +80,9 @@ function ProgressBarInner() {
         position: 'fixed',
         top: 0,
         left: 0,
-        height: '4px', // Slightly thicker for visibility
+        height: '3px',
         width: `${progress}%`,
-        background: 'linear-gradient(90deg, var(--color-candy-pink), var(--color-candy-purple), var(--color-candy-cyan))',
-        boxShadow: '0 0 12px rgba(60, 212, 255, 0.7), 0 0 6px rgba(255, 96, 151, 0.6)',
+        background: 'var(--color-turquoise)',
         zIndex: 9999999, // Set extreme high z-index to overlay header
         transition: 'width 0.25s cubic-bezier(0.1, 0.8, 0.1, 1), opacity 0.3s ease',
         opacity: progress === 100 ? 0 : 1,
