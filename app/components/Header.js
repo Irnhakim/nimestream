@@ -5,13 +5,13 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 const navLinks = [
-  { href: '/', label: 'HOME' },
-  { href: '/anime-list', label: 'ANIME LIST' },
-  { href: '/jadwal-rilis', label: 'JADWAL RILIS' },
-  { href: '/ongoing-anime', label: 'ON-GOING' },
-  { href: '/batch-list', label: 'BATCH LIST' },
-  { href: '/genre-list', label: 'GENRE LIST' },
-  { href: '/riwayat', label: 'WATCHLIST' },
+  { href: '/', label: 'Beranda' },
+  { href: '/anime-list', label: 'Daftar Anime' },
+  { href: '/jadwal-rilis', label: 'Jadwal Rilis' },
+  { href: '/ongoing-anime', label: 'Anime Ongoing' },
+  { href: '/batch-list', label: 'Download Batch' },
+  { href: '/genre-list', label: 'Genre Anime' },
+  { href: '/riwayat', label: 'Riwayat Nonton' },
 ];
 
 export default function Header() {

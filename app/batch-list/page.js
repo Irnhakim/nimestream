@@ -24,11 +24,11 @@ export default async function BatchAnimePage({ searchParams }) {
           <>
             <div className="anime-grid">
               {items.map((item, idx) => (
-                <Link 
-                  key={idx} 
-                  href={`/batch/kuso/${item.slug}`} 
+                <Link
+                  key={idx}
+                  href={`/batch/kuso/${item.slug}`}
                   className="anime-card"
-                  style={{ border: '1px solid rgba(176, 92, 255, 0.15)' }}
+                  style={{ borderColor: 'var(--color-accent)' }}
                 >
                   <div className="card-img-wrapper">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -38,7 +38,7 @@ export default async function BatchAnimePage({ searchParams }) {
                       className="card-img"
                       loading="lazy"
                     />
-                    <div className="card-badge" style={{ background: 'linear-gradient(135deg, var(--color-candy-purple), var(--color-candy-pink))' }}>
+                    <div className="card-badge">
                       📦 BATCH
                     </div>
                   </div>
@@ -100,8 +100,8 @@ export default async function BatchAnimePage({ searchParams }) {
                           padding: '0.5rem 0.95rem',
                           fontSize: '0.8rem',
                           fontWeight: '700',
-                          backgroundColor: 'var(--color-candy-pink)',
-                          borderColor: 'var(--color-candy-pink)',
+                          backgroundColor: 'var(--color-accent)',
+                          borderColor: 'var(--color-accent)',
                           color: 'white',
                           borderRadius: '8px',
                           cursor: 'default'

@@ -21,9 +21,9 @@ export default function AnimeGrid({ title, items, moreLink, isBatch }) {
           return (
             <Link
               key={item.slug || idx}
-              href={detailUrl} 
+              href={detailUrl}
               className="anime-card"
-              style={isBatch ? { border: '1px solid rgba(176, 92, 255, 0.15)' } : {}}
+              style={isBatch ? { borderColor: 'var(--color-accent)' } : {}}
             >
               <div className="card-img-wrapper">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -34,7 +34,7 @@ export default function AnimeGrid({ title, items, moreLink, isBatch }) {
                   loading="lazy"
                 />
                 {isBatch ? (
-                  <div className="card-badge" style={{ background: 'linear-gradient(135deg, var(--color-candy-purple), var(--color-candy-pink))' }}>
+                  <div className="card-badge">
                     📦 BATCH
                   </div>
                 ) : (
@@ -72,27 +72,27 @@ export default function AnimeGrid({ title, items, moreLink, isBatch }) {
                     </span>
                   )}
                   {(item.source === 'Oploverz' || (item.slug && item.slug.startsWith('oploverz-'))) && (
-                    <span style={{ 
-                      fontSize: '0.65rem', 
-                      backgroundColor: 'rgba(60, 212, 255, 0.15)', 
-                      color: 'var(--color-candy-cyan)', 
-                      padding: '0.15rem 0.4rem', 
+                    <span style={{
+                      fontSize: '0.65rem',
+                      backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                      color: 'var(--color-turquoise)',
+                      padding: '0.15rem 0.4rem',
                       borderRadius: '4px',
                       fontWeight: '700',
-                      border: '1px solid rgba(60, 212, 255, 0.25)'
+                      border: '1px solid rgba(6, 182, 212, 0.2)'
                     }}>
                       OPLOVERZ
                     </span>
                   )}
                   {(item.source === 'Alqanime' || (item.slug && item.slug.startsWith('alqanime-'))) && (
-                    <span style={{ 
-                      fontSize: '0.65rem', 
-                      backgroundColor: 'rgba(46, 213, 115, 0.15)', 
-                      color: '#2ed573', 
-                      padding: '0.15rem 0.4rem', 
+                    <span style={{
+                      fontSize: '0.65rem',
+                      backgroundColor: 'rgba(108, 92, 231, 0.1)',
+                      color: 'var(--color-accent)',
+                      padding: '0.15rem 0.4rem',
                       borderRadius: '4px',
                       fontWeight: '700',
-                      border: '1px solid rgba(46, 213, 115, 0.25)'
+                      border: '1px solid rgba(108, 92, 231, 0.2)'
                     }}>
                       ALQANIME
                     </span>

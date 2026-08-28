@@ -15,24 +15,14 @@ export default function NotFound() {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* Dynamic Background Glows */}
+      {/* Subtle Accent Glow */}
       <div style={{
         position: 'absolute',
         width: '300px',
         height: '300px',
-        background: 'radial-gradient(circle, rgba(255, 96, 151, 0.15) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(108, 92, 231, 0.08) 0%, transparent 70%)',
         top: '10%',
         left: '20%',
-        zIndex: 0,
-        pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        width: '300px',
-        height: '300px',
-        background: 'radial-gradient(circle, rgba(60, 212, 255, 0.15) 0%, transparent 70%)',
-        bottom: '10%',
-        right: '20%',
         zIndex: 0,
         pointerEvents: 'none'
       }} />
@@ -41,17 +31,14 @@ export default function NotFound() {
       <div style={{ position: 'relative', zIndex: 1, maxWidth: '600px' }}>
         {/* Floating Animation Wrapper */}
         <div style={{ animation: 'floatAnim 4s ease-in-out infinite', marginBottom: '2rem' }}>
-          <h1 
-            style={{ 
-              fontSize: '8rem', 
-              fontWeight: '900', 
+          <h1
+            style={{
+              fontSize: '8rem',
+              fontWeight: '900',
               margin: 0,
-              background: 'linear-gradient(135deg, var(--color-candy-pink), var(--color-candy-purple), var(--color-candy-cyan))',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: 'var(--color-accent)',
               letterSpacing: '-2px',
-              lineHeight: '1',
-              textShadow: '0 0 40px rgba(176, 92, 255, 0.2)'
+              lineHeight: '1'
             }}
             className="glitch-title"
           >
@@ -60,34 +47,35 @@ export default function NotFound() {
           <div style={{
             fontSize: '1.25rem',
             fontWeight: '600',
-            color: 'var(--color-candy-cyan)',
+            color: 'var(--color-turquoise)',
             marginTop: '0.5rem',
             letterSpacing: '0.1em',
             textTransform: 'uppercase'
           }}>
-            DIMENSI TIDAK DITEMUKAN
+            HALAMAN TIDAK DITEMUKAN
           </div>
         </div>
 
         {/* Anime Custom text */}
         <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: 'var(--text-main)' }}>
-          Waduh! Sepertinya Halaman Ini Hilang di Isekai... 🌌
+          Waduh, Halaman Tidak Ditemukan! 🌌
         </h2>
         <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '2.5rem', fontSize: '0.95rem' }}>
-          Mungkin tautan yang Anda tuju sudah terhapus, pindah domain, atau ter-seal oleh jutsu kuno. Silakan kembali ke beranda untuk mencari anime favorit Anda lainnya!
+          Mungkin tautan yang Anda tuju sudah terhapus, berganti nama, atau sedang tidak tersedia. Silakan kembali ke beranda untuk mencari anime favorit Anda lainnya!
         </p>
 
         {/* Action Button */}
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <Link 
-            href="/" 
-            className="btn-candy"
-            style={{ 
-              padding: '0.8rem 2rem', 
+          <Link
+            href="/"
+            className="btn-all"
+            style={{
+              padding: '0.8rem 2rem',
               fontSize: '0.9rem',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              borderRadius: '6px'
             }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
