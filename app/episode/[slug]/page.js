@@ -36,7 +36,7 @@ export default async function EpisodePage({ params, searchParams }) {
   if (!episode) {
     return (
       <main>
-        <p style={{ textAlign: 'center', margin: '5rem 0', color: 'var(--text-muted)' }}>
+        <p style={{ textAlign: 'center', margin: '2rem 0', color: 'var(--text-muted)' }}>
           Episode tidak ditemukan atau gagal memuat data.
         </p>
       </main>

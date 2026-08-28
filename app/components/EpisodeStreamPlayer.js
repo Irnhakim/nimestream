@@ -255,7 +255,7 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
 
         <div className="stream-meta">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '1rem' }}>
-            <h1 className="stream-title" style={{ margin: 0 }}>{resolvedEpisode.title}</h1>
+            <h1 className="stream-title" style={{ margin: 0, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{resolvedEpisode.title}</h1>
             {currentIframeSrc && (
               <a
                 href={currentIframeSrc}
