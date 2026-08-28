@@ -71,7 +71,7 @@ export default function RiwayatPageClient() {
   return (
     <div className="section-wrapper">
       {/* Header and Titles */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
         <div>
           <h1 className="section-title" style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-candy-purple)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -89,10 +89,11 @@ export default function RiwayatPageClient() {
       {/* Tabs Switcher */}
       <div style={{
         display: 'flex',
+        flexWrap: 'wrap',
         gap: '0.5rem',
         borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
         paddingBottom: '0.75rem',
-        marginBottom: '2rem'
+        marginBottom: '1.25rem'
       }}>
         <button
           onClick={() => setActiveTab('history')}
@@ -274,10 +275,10 @@ export default function RiwayatPageClient() {
 }
 
 const emptyStateStyle = {
-  backgroundColor: 'var(--bg-card)', 
-  border: '1px solid rgba(255, 255, 255, 0.03)', 
-  borderRadius: '16px',
-  padding: '4rem 2rem',
+  backgroundColor: 'var(--bg-card)',
+  border: '1px solid rgba(255, 255, 255, 0.03)',
+  borderRadius: '10px',
+  padding: '2rem 1.25rem',
   textAlign: 'center',
   color: 'var(--text-muted)',
   display: 'flex',

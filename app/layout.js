@@ -41,6 +41,13 @@ export default function RootLayout({ children }) {
       <head>
         <meta name="b1a183711a4cd7aa4f65c6eaebb8283660c15d5e" content="b1a183711a4cd7aa4f65c6eaebb8283660c15d5e" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        {/* Preconnect to frequently fetched image CDN domains */}
+        <link rel="preconnect" href="https://i0.wp.com" />
+        <link rel="preconnect" href="https://i1.wp.com" />
+        <link rel="preconnect" href="https://i2.wp.com" />
+        <link rel="preconnect" href="https://i3.wp.com" />
+        <link rel="dns-prefetch" href="https://otakudesu.cloud" />
+        <link rel="dns-prefetch" href="https://kusonime.com" />
       </head>
       <body>
         <PageProgressBar />
