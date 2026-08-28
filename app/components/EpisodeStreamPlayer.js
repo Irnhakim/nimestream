@@ -8,6 +8,7 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
   const [currentIframeSrc, setCurrentIframeSrc] = useState(episode.defaultStreamUrl);
   const [activeMirror, setActiveMirror] = useState(null);
   const [resolving, setResolving] = useState(false);
+  const [iframeLoading, setIframeLoading] = useState(false);
   const [loadingMirrors, setLoadingMirrors] = useState(false);
 
   useEffect(() => {
@@ -15,6 +16,7 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
     setCurrentIframeSrc(episode.defaultStreamUrl);
     setActiveMirror(null);
     setLoadingMirrors(true);
+    setIframeLoading(false);
 
     const queryParams = window.location.search;
     fetch(`/api/episode/${slug}/mirrors${queryParams}`)
@@ -81,6 +83,7 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
   const resolveMirror = async (mirror, index) => {
     if (activeMirror === index) return;
 
+    setIframeLoading(true);
     // Direct URLs (non-Otakudesu streams) can be set directly to iframe src
     const isDirectUrl = /^(https?:)?\/\//i.test(mirror.content);
     if (isDirectUrl || (mirror.source && mirror.source !== 'Otakudesu')) {
@@ -104,10 +107,12 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
         setCurrentIframeSrc(data.src);
       } else {
         alert('Gagal memuat mirror stream. Silakan pilih server lain.');
+        setIframeLoading(false);
       }
     } catch (e) {
       console.error(e);
       alert('Error saat memuat video player.');
+      setIframeLoading(false);
     } finally {
       setResolving(false);
     }
@@ -141,24 +146,50 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
               <div style={{
                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backgroundColor: '#050608', color: 'var(--color-candy-cyan)', fontWeight: 'bold'
+                backgroundColor: '#050608', color: 'var(--color-candy-cyan)', fontWeight: 'bold',
+                zIndex: 10
               }}>
                 Menyiapkan player, harap tunggu...
               </div>
-            ) : (
-              <iframe
-                src={currentIframeSrc}
-                allowFullScreen={true}
-                referrerPolicy="no-referrer"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox"
-              />
-            )}
+            ) : null}
+
+            {iframeLoading && !resolving ? (
+              <div style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                backgroundColor: 'rgba(5, 6, 8, 0.85)', color: '#fff', fontSize: '0.9rem',
+                zIndex: 9
+              }}>
+                Memuat video...
+              </div>
+            ) : null}
+
+            <iframe
+              src={currentIframeSrc}
+              allowFullScreen={true}
+              referrerPolicy="no-referrer"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation"
+              onLoad={() => setIframeLoading(false)}
+            />
           </div>
         </div>
 
         <div className="stream-meta">
-          <h1 className="stream-title">{resolvedEpisode.title}</h1>
-          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '1rem' }}>
+            <h1 className="stream-title" style={{ margin: 0 }}>{resolvedEpisode.title}</h1>
+            {currentIframeSrc && (
+              <a
+                href={currentIframeSrc}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-download"
+                style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+              >
+                🗗 Buka Player di Tab Baru
+              </a>
+            )}
+          </div>
+
           <div className="nav-buttons">
             {resolvedEpisode.prevSlug ? (
               <Link href={`/episode/${resolvedEpisode.prevSlug}`} className="btn-nav">

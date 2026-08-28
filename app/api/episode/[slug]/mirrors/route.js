@@ -2,12 +2,15 @@ import { fetchHtml, parseEpisodeDetails } from '@/lib/scraper';
 import { getOploverzEpisode } from '@/lib/oploverzScraper';
 import { getAlqanimeEpisode, getAlqanimeDetails } from '@/lib/alqanimeScraper';
 import { getEpisodeFromSource, getDetailsFromSource } from '@/lib/multiScraper';
+import { getFileCache, setFileCache } from '@/lib/fileCache';
 
 const sourceKeys = [
-  'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 
-  'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime', 
+  'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy',
+  'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime',
   'animekompi', 'donghub', 'dramabox'
 ];
+
+const CACHE_TTL_MS = 3 * 60 * 60 * 1000; // 3 hours
 
 const getOtakudesuEpisode = async (parentSlug, epNum) => {
   try {
@@ -31,6 +34,12 @@ export async function GET(request, { params }) {
   const { slug } = await params;
   if (!slug) {
     return Response.json({ error: 'Missing slug' }, { status: 400 });
+  }
+
+  const cacheKey = `mirrors_${slug}`;
+  const cached = getFileCache(cacheKey, CACHE_TTL_MS);
+  if (cached) {
+    return Response.json(cached);
   }
 
   const { searchParams } = new URL(request.url);
@@ -219,6 +228,8 @@ export async function GET(request, { params }) {
       downloadsCount: data.downloads.length,
       sourcesMerged: [...new Set(data.mirrors.map(m => m.source))]
     });
+
+    setFileCache(cacheKey, data);
   }
 
   return Response.json(data);

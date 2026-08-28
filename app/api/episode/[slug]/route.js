@@ -2,12 +2,15 @@ import { fetchHtml, parseEpisodeDetails } from '@/lib/scraper';
 import { getOploverzEpisode } from '@/lib/oploverzScraper';
 import { getAlqanimeEpisode } from '@/lib/alqanimeScraper';
 import { getEpisodeFromSource } from '@/lib/multiScraper';
+import { getFileCache, setFileCache } from '@/lib/fileCache';
 
 const sourceKeys = [
-  'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 
-  'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime', 
+  'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy',
+  'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime',
   'animekompi', 'donghub', 'dramabox'
 ];
+
+const EPISODE_CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours
 
 // Helper to fetch and parse Otakudesu episode mirrors
 const getOtakudesuEpisode = async (parentSlug, epNum) => {
@@ -33,6 +36,12 @@ export async function GET(request, { params }) {
   const { slug } = await params;
   if (!slug) {
     return Response.json({ error: 'Missing slug' }, { status: 400 });
+  }
+
+  const cacheKey = `episode_detail_${slug}`;
+  const cached = getFileCache(cacheKey, EPISODE_CACHE_TTL);
+  if (cached) {
+    return Response.json(cached);
   }
 
   const { searchParams } = new URL(request.url);
@@ -149,6 +158,7 @@ export async function GET(request, { params }) {
       return null;
     };
 
+    setFileCache(cacheKey, data);
     return Response.json(data);
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });

@@ -1,19 +1,27 @@
 import { fetchHtml, parseAnimeDetails, parseSearchList } from '@/lib/scraper';
-import { getFileCache } from '@/lib/fileCache';
+import { getFileCache, setFileCache } from '@/lib/fileCache';
 import { getOploverzDetails } from '@/lib/oploverzScraper';
 import { getAlqanimeDetails } from '@/lib/alqanimeScraper';
 import { getDetailsFromSource } from '@/lib/multiScraper';
 
 const sourceKeys = [
-  'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy', 
-  'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime', 
+  'donghua', 'samehadaku', 'animasu', 'zoronime', 'anoboy',
+  'nimegami', 'animeindo', 'animekuindo', 'winbu', 'kuramanime',
   'animekompi', 'donghub', 'dramabox'
 ];
+
+const ANIME_CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours
 
 export async function GET(request, { params }) {
   const { slug } = await params;
   if (!slug) {
     return Response.json({ error: 'Missing slug' }, { status: 400 });
+  }
+
+  const cacheKey = `anime_detail_${slug}`;
+  const cached = getFileCache(cacheKey, ANIME_CACHE_TTL);
+  if (cached) {
+    return Response.json(cached);
   }
 
   let data = null;
@@ -101,6 +109,8 @@ export async function GET(request, { params }) {
     }
 
     data.recommendations = recommendations;
+
+    setFileCache(cacheKey, data);
     return Response.json(data);
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
