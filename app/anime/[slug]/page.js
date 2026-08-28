@@ -4,6 +4,7 @@ import EpisodeBox from '@/app/components/EpisodeBox';
 import KusonimeBatchLink from '@/app/components/KusonimeBatchLink';
 import AnimeGrid from '@/app/components/AnimeGrid';
 import BookmarkButton from '@/app/components/BookmarkButton';
+import SynopsisBox from '@/app/components/SynopsisBox';
 
 async function getAnimeDetails(slug) {
   try {
@@ -34,8 +35,18 @@ export default async function AnimeDetailsPage({ params }) {
   }
 
   return (
-    <main>
-      <div className="detail-container">
+    <main style={{ position: 'relative' }}>
+      {/* Dynamic Ambiance Background from Cover Thumbnail */}
+      {anime.thumb && (
+        <div
+          className="detail-backdrop-bg"
+          style={{
+            backgroundImage: `url(/api/img?url=${encodeURIComponent(anime.thumb)})`
+          }}
+        />
+      )}
+
+      <div className="detail-container" style={{ position: 'relative', zIndex: 1 }}>
         <div className="detail-sidebar">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={anime.thumb ? `/api/img?url=${encodeURIComponent(anime.thumb)}` : '/placeholder.svg'} alt={anime.title} className="detail-thumb" />
@@ -56,10 +67,7 @@ export default async function AnimeDetailsPage({ params }) {
           {anime.sinopsis && (
             <div>
               <h2 className="section-title">Sinopsis</h2>
-              <div 
-                className="synopsis-box" 
-                dangerouslySetInnerHTML={{ __html: anime.sinopsis }}
-              />
+              <SynopsisBox htmlContent={anime.sinopsis} />
             </div>
           )}
 
