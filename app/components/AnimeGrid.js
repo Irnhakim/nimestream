@@ -7,8 +7,8 @@ export default function AnimeGrid({ title, items, moreLink, isBatch }) {
 
   return (
     <div className="section-wrapper">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-        <h2 className="section-title" style={{ marginBottom: 0 }}>{title}</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <h2 className="section-title" style={{ marginBottom: 0, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</h2>
         {moreLink && (
           <Link href={moreLink} className="btn-download" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px' }}>
             LIHAT SELENGKAPNYA &raquo;
@@ -44,17 +44,6 @@ export default function AnimeGrid({ title, items, moreLink, isBatch }) {
                         {item.ep}
                       </div>
                     )}
-                    {item.dayOrRating && (
-                      <div className="card-badge-sub" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '0.25rem 0.5rem' }}>
-                        {/* If it looks like a score rating (e.g. 7.85 or containing digits), render a yellow star */}
-                        {/^\d+(\.\d+)?$/.test(item.dayOrRating) && (
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="#ffd54f" stroke="#ffd54f" strokeWidth="1" style={{ display: 'inline-block', flexShrink: 0, marginTop: '-1px' }}>
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                          </svg>
-                        )}
-                        <span>{item.dayOrRating}</span>
-                      </div>
-                    )}
                   </>
                 )}
               </div>
@@ -63,6 +52,16 @@ export default function AnimeGrid({ title, items, moreLink, isBatch }) {
                   {item.title}
                 </h3>
                 <div className="card-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {item.dayOrRating && (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', color: '#ffd54f' }}>
+                      {/^\d+(\.\d+)?$/.test(item.dayOrRating) && (
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="#ffd54f" stroke="#ffd54f" strokeWidth="1" style={{ flexShrink: 0 }}>
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                      )}
+                      <span style={{ color: 'var(--text-muted)' }}>{item.dayOrRating}</span>
+                    </span>
+                  )}
                   {item.date && (
                     <span>
                       <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{width: '12px', height: '12px'}}>

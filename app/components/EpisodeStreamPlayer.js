@@ -7,6 +7,14 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
   const [resolvedEpisode, setResolvedEpisode] = useState(episode);
   const [currentIframeSrc, setCurrentIframeSrc] = useState(episode.defaultStreamUrl);
   const [activeMirror, setActiveMirror] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
   const [resolving, setResolving] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(false);
   const [loadingMirrors, setLoadingMirrors] = useState(false);
@@ -255,18 +263,36 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
 
         <div className="stream-meta">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '1rem' }}>
-            <h1 className="stream-title" style={{ margin: 0 }}>{resolvedEpisode.title}</h1>
-            {currentIframeSrc && (
+            <h1 className="stream-title" style={{ margin: 0, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{resolvedEpisode.title}</h1>
+            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+              <button
+                onClick={handleCopyLink}
+                className="btn-download"
+                style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '6px', background: copied ? 'rgba(124, 244, 255, 0.1)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(124,244,255,0.3)' : 'rgba(255,255,255,0.1)'}`, color: copied ? 'var(--color-turquoise)' : 'inherit', cursor: 'pointer' }}
+              >
+                {copied ? '✓ Tersalin' : '🔗 Salin Link'}
+              </button>
               <a
-                href={currentIframeSrc}
+                href={`https://wa.me/?text=${encodeURIComponent(resolvedEpisode.title + ' - ' + (typeof window !== 'undefined' ? window.location.href : ''))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-download"
-                style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(37,211,102,0.08)', border: '1px solid rgba(37,211,102,0.2)', color: '#25d366' }}
               >
-                🗗 Buka Player di Tab Baru
+                WhatsApp
               </a>
-            )}
+              {currentIframeSrc && (
+                <a
+                  href={currentIframeSrc}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-download"
+                  style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                >
+                  🗗 Buka Player di Tab Baru
+                </a>
+              )}
+            </div>
           </div>
 
           <div className="nav-buttons">

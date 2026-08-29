@@ -41,6 +41,13 @@ export default function RootLayout({ children }) {
       <head>
         <meta name="b1a183711a4cd7aa4f65c6eaebb8283660c15d5e" content="b1a183711a4cd7aa4f65c6eaebb8283660c15d5e" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        {/* Preconnect to frequently fetched image CDN domains */}
+        <link rel="preconnect" href="https://i0.wp.com" />
+        <link rel="preconnect" href="https://i1.wp.com" />
+        <link rel="preconnect" href="https://i2.wp.com" />
+        <link rel="preconnect" href="https://i3.wp.com" />
+        <link rel="dns-prefetch" href="https://otakudesu.cloud" />
+        <link rel="dns-prefetch" href="https://kusonime.com" />
       </head>
       <body>
         <PageProgressBar />
@@ -52,12 +59,12 @@ export default function RootLayout({ children }) {
             <p className="support-title">☕ Dukung Developer</p>
             <div className="support-buttons">
               <a
-                href="https://buymeacoffee.com/irnhakim"
+                href="https://trakteer.id/ryuzure"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-support btn-bmc"
               >
-                Buy Me a Coffee
+                Trakteer
               </a>
               <a
                 href="https://saweria.co/irnhakim"
