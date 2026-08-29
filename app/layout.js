@@ -59,12 +59,12 @@ export default function RootLayout({ children }) {
             <p className="support-title">☕ Dukung Developer</p>
             <div className="support-buttons">
               <a
-                href="https://buymeacoffee.com/irnhakim"
+                href="https://trakteer.id/ryuzure"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-support btn-bmc"
               >
-                Buy Me a Coffee
+                Trakteer
               </a>
               <a
                 href="https://saweria.co/irnhakim"
