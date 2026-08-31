@@ -55,10 +55,10 @@ export default async function GenreListPage() {
 
       <style>{`
         .genre-item-card:hover {
-          border-color: var(--color-candy-cyan) !important;
-          color: var(--color-candy-cyan);
+          border-color: var(--color-accent) !important;
+          color: var(--color-accent);
           transform: scale(1.04);
-          box-shadow: 0 8px 20px rgba(60, 212, 255, 0.15);
+          box-shadow: 0 8px 20px rgba(232, 93, 4, 0.15);
         }
       `}</style>
     </main>

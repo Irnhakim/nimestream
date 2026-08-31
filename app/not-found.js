@@ -47,7 +47,7 @@ export default function NotFound() {
           <div style={{
             fontSize: '1.25rem',
             fontWeight: '600',
-            color: 'var(--color-turquoise)',
+            color: 'var(--color-accent)',
             marginTop: '0.5rem',
             letterSpacing: '0.1em',
             textTransform: 'uppercase'

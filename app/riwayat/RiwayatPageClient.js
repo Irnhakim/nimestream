@@ -246,7 +246,7 @@ export default function RiwayatPageClient() {
                     <div className="history-row-info">
                       <h3 className="history-row-title">{item.title}</h3>
                       <div className="history-row-meta">
-                        <p className="history-row-subtitle" style={{ color: 'var(--color-candy-cyan)' }}>
+                        <p className="history-row-subtitle" style={{ color: 'var(--color-accent)' }}>
                           Status: {item.status} <span className="dot-divider">·</span> Rating: {item.rating}
                         </p>
                         <p className="history-row-date">

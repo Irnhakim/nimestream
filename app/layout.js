@@ -41,6 +41,9 @@ export default function RootLayout({ children }) {
       <head>
         <meta name="b1a183711a4cd7aa4f65c6eaebb8283660c15d5e" content="b1a183711a4cd7aa4f65c6eaebb8283660c15d5e" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
         {/* Preconnect to frequently fetched image CDN domains */}
         <link rel="preconnect" href="https://i0.wp.com" />
         <link rel="preconnect" href="https://i1.wp.com" />
