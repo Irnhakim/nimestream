@@ -16,6 +16,44 @@ async function getEpisodeDetails(slug, searchParamsStr = '') {
   }
 }
 
+export async function generateMetadata({ params, searchParams }) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+  const { slug } = resolvedParams;
+
+  const queryParams = [];
+  if (resolvedSearchParams) {
+    Object.entries(resolvedSearchParams).forEach(([k, v]) => {
+      if (v) queryParams.push(`${k}=${encodeURIComponent(v)}`);
+    });
+  }
+  const episode = await getEpisodeDetails(slug, queryParams.join('&'));
+
+  if (!episode) return { title: 'Episode - NimeStream' };
+
+  const title = `${episode.title} Sub Indo - Streaming di NimeStream`;
+  const description = `Nonton ${episode.title} subtitle indonesia gratis di NimeStream. Streaming anime sub indo kualitas HD, tanpa iklan mengganggu.`;
+
+  return {
+    title,
+    description,
+    keywords: `${episode.title} sub indo, nonton ${episode.title}, streaming ${episode.title} subtitle indonesia, download ${episode.title} sub indo`,
+    openGraph: {
+      title,
+      description,
+      url: `https://nimestream.my.id/episode/${slug}`,
+      siteName: 'NimeStream',
+      type: 'website',
+      locale: 'id_ID',
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
+  };
+}
+
 export default async function EpisodePage({ params, searchParams }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;

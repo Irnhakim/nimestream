@@ -4,24 +4,25 @@ import PopunderAd from './components/PopunderAd';
 import PageProgressBar from './components/PageProgressBar';
 
 export const metadata = {
-  title: 'NimeStream - Nonton & Streaming Anime Subtitle Indonesia',
-  description: 'NimeStream adalah tempat nonton dan streaming anime subtitle indonesia gratis terlengkap dengan tampilan premium.',
+  title: 'NimeStream - Nonton Anime Sub Indo Gratis | Streaming Anime Subtitle Indonesia',
+  description: 'Nonton anime sub indo gratis di NimeStream. Streaming anime subtitle indonesia terlengkap, update setiap hari, kualitas HD. Anime ongoing, completed, dan batch tersedia.',
+  keywords: 'nonton anime sub indo, streaming anime sub indo, download anime sub indo, nonton anime subtitle indonesia, streaming anime subtitle indonesia gratis, download anime subtitle indonesia, anime sub indo terbaru, anime ongoing sub indo, nonton anime online gratis',
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
     apple: '/logo.svg',
   },
   openGraph: {
-    title: 'NimeStream - Nonton & Streaming Anime Subtitle Indonesia',
-    description: 'NimeStream adalah tempat nonton dan streaming anime subtitle indonesia gratis terlengkap dengan tampilan premium.',
-    url: 'https://anime.irnhakim.my.id',
+    title: 'NimeStream - Nonton Anime Sub Indo Gratis | Streaming Anime Subtitle Indonesia',
+    description: 'Nonton anime sub indo gratis di NimeStream. Streaming anime subtitle indonesia terlengkap, update setiap hari, kualitas HD.',
+    url: 'https://nimestream.my.id',
     siteName: 'NimeStream',
     images: [
       {
-        url: 'https://anime.irnhakim.my.id/logo.svg',
+        url: 'https://nimestream.my.id/logo.svg',
         width: 512,
         height: 512,
-        alt: 'NimeStream Logo',
+        alt: 'NimeStream - Nonton Anime Sub Indo',
       },
     ],
     locale: 'id_ID',
@@ -29,9 +30,9 @@ export const metadata = {
   },
   twitter: {
     card: 'summary',
-    title: 'NimeStream - Nonton & Streaming Anime Subtitle Indonesia',
-    description: 'NimeStream adalah tempat nonton dan streaming anime subtitle indonesia gratis terlengkap dengan tampilan premium.',
-    images: ['https://anime.irnhakim.my.id/logo.svg'],
+    title: 'NimeStream - Nonton Anime Sub Indo Gratis',
+    description: 'Nonton anime sub indo gratis di NimeStream. Streaming anime subtitle indonesia terlengkap, update setiap hari.',
+    images: ['https://nimestream.my.id/logo.svg'],
   },
 };
 
@@ -81,7 +82,7 @@ export default function RootLayout({ children }) {
           </div>
           <p>NimeStream &copy; 2026. Made with <span>&hearts;</span> for Anime Lovers.</p>
           <p style={{ fontSize: '0.75rem', marginTop: '0.25rem', opacity: 0.7 }}>
-            All data scraped from Otakudesu & Kusonime. We do not store any files on our server.
+            All data scraped from Internet. We do not store any files on our server.
           </p>
         </footer>
       </body>

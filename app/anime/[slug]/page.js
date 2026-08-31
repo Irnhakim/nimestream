@@ -19,6 +19,41 @@ async function getAnimeDetails(slug) {
   }
 }
 
+export async function generateMetadata({ params }) {
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
+  const anime = await getAnimeDetails(slug);
+
+  if (!anime) {
+    return { title: 'Anime Tidak Ditemukan - NimeStream' };
+  }
+
+  const title = `${anime.title} Sub Indo - Nonton & Streaming di NimeStream`;
+  const description = `Nonton ${anime.title} subtitle indonesia di NimeStream. ${anime.sinopsis ? anime.sinopsis.replace(/<[^>]+>/g, '').slice(0, 120) + '...' : `Streaming ${anime.title} sub indo gratis, update terbaru.`}`;
+  const imageUrl = anime.thumb ? `https://nimestream.my.id/api/img?url=${encodeURIComponent(anime.thumb)}` : 'https://nimestream.my.id/logo.svg';
+
+  return {
+    title,
+    description,
+    keywords: `${anime.title} sub indo, nonton ${anime.title}, streaming ${anime.title} subtitle indonesia, download ${anime.title} sub indo, ${anime.title} episode, ${anime.title} batch sub indo`,
+    openGraph: {
+      title,
+      description,
+      url: `https://nimestream.my.id/anime/${slug}`,
+      siteName: 'NimeStream',
+      images: [{ url: imageUrl, alt: anime.title }],
+      type: 'website',
+      locale: 'id_ID',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
+    },
+  };
+}
+
 export default async function AnimeDetailsPage({ params }) {
   const resolvedParams = await params;
   const { slug } = resolvedParams;
