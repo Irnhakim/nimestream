@@ -198,7 +198,7 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
 
   return (
     <div className="stream-container">
-      <div>
+      <div className="player-column">
         <div className="player-wrapper">
           <div className="aspect-ratio-video">
             {resolving ? (
@@ -319,31 +319,6 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
             )}
           </div>
         </div>
-
-        {/* Download Section (Moved inside first column to eliminate grid alignment gap) */}
-        {(resolvedEpisode.downloads || []).length > 0 && (
-          <div className="download-box" style={{ marginTop: '1.5rem' }}>
-            <h3 className="section-title">Download Episode</h3>
-            {resolvedEpisode.downloads.map((dl, idx) => (
-              <div key={idx} className="download-row">
-                <span className="download-quality">{dl.quality}</span>
-                <div className="download-links">
-                  {dl.links.map((link, j) => (
-                    <a
-                      key={j}
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-download"
-                    >
-                      {link.server}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Sidebar Server Selector */}
@@ -380,6 +355,31 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
           ))
         )}
       </div>
+
+      {/* Download Section (Placed as sibling to support flexible ordering) */}
+      {(resolvedEpisode.downloads || []).length > 0 && (
+        <div className="download-box">
+          <h3 className="section-title">Download Episode</h3>
+          {resolvedEpisode.downloads.map((dl, idx) => (
+            <div key={idx} className="download-row">
+              <span className="download-quality">{dl.quality}</span>
+              <div className="download-links">
+                {dl.links.map((link, j) => (
+                  <a
+                    key={j}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-download"
+                  >
+                    {link.server}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
