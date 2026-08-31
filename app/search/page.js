@@ -188,7 +188,7 @@ function tabButtonStyle(isActive) {
     border: '1px solid',
     borderColor: isActive ? 'var(--color-accent)' : 'var(--border-color)',
     backgroundColor: isActive ? 'rgba(108, 92, 231, 0.08)' : 'rgba(255,255,255,0.02)',
-    color: isActive ? 'var(--color-turquoise)' : 'var(--text-muted)',
+    color: isActive ? 'var(--color-accent)' : 'var(--text-muted)',
     cursor: 'pointer',
     transition: 'var(--transition-smooth)'
   };

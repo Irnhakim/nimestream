@@ -89,7 +89,7 @@ export default async function AnimeListPage() {
                          width: '6px',
                          height: '6px',
                          borderRadius: '50%',
-                         backgroundColor: anime.isKusoBatch ? 'var(--color-candy-purple)' : 'var(--color-candy-cyan)',
+                         backgroundColor: anime.isKusoBatch ? 'var(--color-accent)' : 'var(--color-accent)',
                          marginRight: '0.75rem',
                          flexShrink: 0
                        }}></span>
@@ -111,10 +111,10 @@ export default async function AnimeListPage() {
       
       <style>{`
         .anime-list-item-link:hover {
-          border-color: var(--color-candy-purple) !important;
+          border-color: var(--color-accent) !important;
           transform: translateY(-2px);
-          color: var(--color-candy-cyan);
-          box-shadow: 0 4px 12px rgba(176, 92, 255, 0.1);
+          color: var(--color-accent);
+          box-shadow: 0 4px 12px rgba(232, 93, 4, 0.15);
         }
       `}</style>
     </main>

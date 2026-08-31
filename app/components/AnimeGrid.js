@@ -74,7 +74,7 @@ export default function AnimeGrid({ title, items, moreLink, isBatch }) {
                     <span style={{
                       fontSize: '0.65rem',
                       backgroundColor: 'rgba(6, 182, 212, 0.1)',
-                      color: 'var(--color-turquoise)',
+                      color: 'var(--color-accent)',
                       padding: '0.15rem 0.4rem',
                       borderRadius: '4px',
                       fontWeight: '700',

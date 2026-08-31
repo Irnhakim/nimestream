@@ -82,7 +82,7 @@ function ProgressBarInner() {
         left: 0,
         height: '3px',
         width: `${progress}%`,
-        background: 'var(--color-turquoise)',
+        background: 'var(--color-accent)',
         zIndex: 9999999, // Set extreme high z-index to overlay header
         transition: 'width 0.25s cubic-bezier(0.1, 0.8, 0.1, 1), opacity 0.3s ease',
         opacity: progress === 100 ? 0 : 1,

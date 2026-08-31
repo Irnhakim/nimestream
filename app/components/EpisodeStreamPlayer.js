@@ -205,7 +205,7 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
               <div style={{
                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backgroundColor: '#050608', color: 'var(--color-candy-cyan)', fontWeight: 'bold',
+                backgroundColor: '#050608', color: 'var(--color-accent)', fontWeight: 'bold',
                 zIndex: 10
               }}>
                 Menyiapkan player, harap tunggu...
@@ -268,7 +268,7 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
               <button
                 onClick={handleCopyLink}
                 className="btn-download"
-                style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '6px', background: copied ? 'rgba(124, 244, 255, 0.1)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(124,244,255,0.3)' : 'rgba(255,255,255,0.1)'}`, color: copied ? 'var(--color-turquoise)' : 'inherit', cursor: 'pointer' }}
+                style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '6px', background: copied ? 'rgba(232, 93, 4, 0.1)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(232,93,4,0.3)' : 'rgba(255,255,255,0.1)'}`, color: copied ? 'var(--color-accent)' : 'inherit', cursor: 'pointer' }}
               >
                 {copied ? '✓ Tersalin' : '🔗 Salin Link'}
               </button>
@@ -326,7 +326,7 @@ export default function EpisodeStreamPlayer({ episode, slug }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
           <h3 className="section-title" style={{ margin: 0 }}>Pilih Server</h3>
           {loadingMirrors && (
-            <span style={{ fontSize: '0.72rem', color: 'var(--color-candy-cyan)', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+            <span style={{ fontSize: '0.72rem', color: 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
               <span className="loading-dots">Mencari mirror...</span>
             </span>
           )}
