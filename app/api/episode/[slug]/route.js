@@ -84,8 +84,23 @@ export async function GET(request, { params }) {
       data = await getAlqanimeEpisode(realSlug);
     } else {
       // Otakudesu
-      const html = await fetchHtml(`https://otakudesu.blog/episode/${slug}/`);
-      data = parseEpisodeDetails(html);
+      let html = null;
+      try {
+        html = await fetchHtml(`https://otakudesu.blog/episode/${slug}/`);
+      } catch (err) {
+        // Coba alternatif variasi slug jika slug hasil sintetis berbeda akhiran
+        const altSlug = slug.includes('-sub-indo')
+          ? slug.replace('-sub-indo', '-subtitle-indonesia')
+          : slug.replace('-subtitle-indonesia', '-sub-indo');
+        try {
+          html = await fetchHtml(`https://otakudesu.blog/episode/${altSlug}/`);
+        } catch {
+          html = null;
+        }
+      }
+      if (html) {
+        data = parseEpisodeDetails(html);
+      }
     }
 
     if (!data) {
