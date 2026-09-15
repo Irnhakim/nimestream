@@ -10,7 +10,8 @@ const sourceKeys = [
   'animekompi', 'donghub', 'dramabox'
 ];
 
-const ANIME_CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours
+// Samakan dengan durasi cache ongoing list (1 jam)
+const ANIME_CACHE_TTL = 1 * 60 * 60 * 1000; // 1 hour (sama seperti ongoing)
 
 export async function GET(request, { params }) {
   const { slug } = await params;
@@ -18,8 +19,12 @@ export async function GET(request, { params }) {
     return Response.json({ error: 'Missing slug' }, { status: 400 });
   }
 
+  // Dukung query parameter ?refresh=true untuk bypass/paksa update jika ada episode baru
+  const { searchParams } = new URL(request.url);
+  const forceRefresh = searchParams.get('refresh') === 'true';
+
   const cacheKey = `anime_detail_${slug}`;
-  const cached = getFileCache(cacheKey, ANIME_CACHE_TTL);
+  const cached = !forceRefresh ? getFileCache(cacheKey, ANIME_CACHE_TTL) : null;
   if (cached) {
     return Response.json(cached);
   }
