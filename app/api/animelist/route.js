@@ -2,6 +2,7 @@ import { fetchHtml, parseAnimeList } from '@/lib/scraper';
 import { getKusonimeAnimeList, KUSONIME_ENABLED } from '@/lib/kusonimeScraper';
 import { getFileCache, setFileCache } from '@/lib/fileCache';
 
+// Invalidate turbopack cache
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const CACHE_KEY = 'merged_animelist';
 
