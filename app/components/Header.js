@@ -9,6 +9,7 @@ const navLinks = [
   { href: '/anime-list', label: 'Daftar Anime' },
   { href: '/jadwal-rilis', label: 'Jadwal Rilis' },
   { href: '/ongoing-anime', label: 'Anime Ongoing' },
+  { href: '/complete-anime', label: 'Anime Tamat' },
   { href: '/batch-list', label: 'Download Batch' },
   { href: '/genre-list', label: 'Genre Anime' },
   { href: '/riwayat', label: 'Riwayat Nonton' },

@@ -37,7 +37,7 @@ export default async function Home() {
       <AnimeGrid title="Anime On-Going Terbaru" items={ongoing} moreLink="/ongoing-anime" />
       
       {/* Completed Section */}
-      <AnimeGrid title="Anime Completed Terbaru" items={completed} moreLink="/anime-list" />
+      <AnimeGrid title="Anime Completed Terbaru" items={completed} moreLink="/complete-anime" />
 
       {/* Kusonime Batch Section */}
       {process.env.NEXT_PUBLIC_KUSONIME_ENABLED === 'true' && latestBatch.length > 0 && (

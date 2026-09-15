@@ -4,6 +4,7 @@ const STATIC_ROUTES = [
   { url: BASE_URL, changeFrequency: 'daily', priority: 1 },
   { url: `${BASE_URL}/anime-list`, changeFrequency: 'weekly', priority: 0.8 },
   { url: `${BASE_URL}/ongoing-anime`, changeFrequency: 'daily', priority: 0.9 },
+  { url: `${BASE_URL}/complete-anime`, changeFrequency: 'daily', priority: 0.85 },
   { url: `${BASE_URL}/batch-list`, changeFrequency: 'weekly', priority: 0.7 },
   { url: `${BASE_URL}/jadwal-rilis`, changeFrequency: 'daily', priority: 0.7 },
   { url: `${BASE_URL}/genre-list`, changeFrequency: 'monthly', priority: 0.5 },
